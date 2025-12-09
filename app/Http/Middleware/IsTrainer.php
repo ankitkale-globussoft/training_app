@@ -16,9 +16,11 @@ class IsTrainer
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // Get authenticated user from any guard (sanctum handles both users and trainers)
         $user = $request->user();
 
-        if (!$user || $user->getTable() !== 'trainers') {
+        // Check if user exists and is a Trainer model instance
+        if (!$user || !($user instanceof \App\Models\Trainer)) {
             return response()->json([
                 'success' => false,
                 'msg' => 'Unauthorized. Trainer access only.'

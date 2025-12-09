@@ -1,10 +1,9 @@
 <?php
 
-use App\Http\Controllers\Admin\ProgramController;
-use App\Http\Controllers\Admin\ProgramTypesController;
+use App\Http\Controllers\Api\Admin\ProgramController;
+use App\Http\Controllers\Api\Admin\ProgramTypesController;
+use App\Http\Controllers\Api\Trainer\TAuthController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\Controller;
-use App\Http\Controllers\Trainer\TAuthController;
 use Faker\Guesser\Name;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -23,14 +22,16 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::resource('program', ProgramController::class)->except(['show', 'index']);
 });
 
-// Trainer routes
-
+// Trainer routes (public - no auth required)
 Route::post('trainer/login', [TAuthController::class, 'login']);
-Route::resource('tauth', TAuthController::class);
+Route::post('trainer/signup', [TAuthController::class, 'signup']);
 
-
-// to be fixed...
-Route::middleware(['auth:sanctum', 'trainer'])->group(function(){
+// Trainer protected routes (requires auth + trainer role)
+Route::middleware('auth:sanctum')->middleware('trainer')->group(function(){
+    Route::put('trainer/{id}', [TAuthController::class, 'update']);           // Edit trainer profile
+    Route::get('trainer/{id}', [TAuthController::class, 'show']);             // Get trainer profile
+    Route::delete('trainer/{id}', [TAuthController::class, 'destroy']);       // Delete trainer
+    Route::get('trainers', [TAuthController::class, 'index']);                // List all trainers
 });
 
 // User routes

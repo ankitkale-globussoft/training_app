@@ -16,10 +16,15 @@ class IsAdmin
     public function handle(Request $request, Closure $next): Response
     {
         if (!$request->user() || $request->user()->user_type !== 'admin') {
-            return response()->json([
-                'success' => false,
-                'msg'     => 'Unauthorized. Admin access only.'
-            ], 403);
+            //for api
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'msg'     => 'Unauthorized. Admin access only.'
+                ], 403);
+            }
+            // for web 
+            return redirect()->route('login')->with('error', 'Unauthorized access');
         }
 
         return $next($request);
