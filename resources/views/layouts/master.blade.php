@@ -25,5 +25,8 @@
 
     {{-- Scripts --}}
     @include('layouts.scripts')
+
+    {{-- Ajax --}}
+    @stack('ajax')
 </body>
 </html>

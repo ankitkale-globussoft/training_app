@@ -132,7 +132,7 @@ class TAuthController extends Controller
             'email'         => 'required|email|unique:trainers,email',
             'password'      => 'required|min:6|max:32',
 
-            'phone'         => 'required|string|max:15|unique:trainers,phone',
+            'phone'         => 'required|string|digits:10|unique:trainers,phone',
             'addr_line1'    => 'required|string|max:255',
             'addr_line2'    => 'nullable|string|max:255',
             'city'          => 'required|string|max:255',

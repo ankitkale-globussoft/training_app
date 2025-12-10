@@ -27,7 +27,7 @@ Route::post('trainer/login', [TAuthController::class, 'login']);
 Route::post('trainer/signup', [TAuthController::class, 'signup']);
 
 // Trainer protected routes (requires auth + trainer role)
-Route::middleware('auth:sanctum')->middleware('trainer')->group(function(){
+Route::middleware('auth:sanctum')->middleware('trainer.api')->group(function(){
     Route::put('trainer/{id}', [TAuthController::class, 'update']);           // Edit trainer profile
     Route::get('trainer/{id}', [TAuthController::class, 'show']);             // Get trainer profile
     Route::delete('trainer/{id}', [TAuthController::class, 'destroy']);       // Delete trainer
