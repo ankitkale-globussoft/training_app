@@ -11,7 +11,7 @@ Route::get('trainer/signup', function () {
 });
 
 // Admin Routes -- 
-Route::prefix('admin')->name('admin.')->group(function(){
+Route::prefix('admin')->name('admin.')->group(function(){ 
     // add admin routes here...
 });
 
@@ -27,7 +27,7 @@ Route::prefix('trainer')->name('trainer.')->group(function () {
     // Trainer protected routes (requires auth + trainer role)
     Route::middleware('trainer.web')->group(function(){
         Route::get('dashboard', [TrainerController::class, 'dashboard'])->name('dashboard');
-        Route::get('logout', [TrainerController::class, 'logout'])->name('logout');
+        Route::get('logout', [TrainerAuthController::class, 'logout'])->name('logout');
     });
 
 });

@@ -16,9 +16,8 @@ class IsTrainerWeb
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $trainer = Auth::guard('trainer_web')->user();
-        
-        if (!$trainer) {
+        $trainer = Auth::guard('trainer_web')->user(); 
+        if (!$trainer) { 
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
@@ -28,7 +27,6 @@ class IsTrainerWeb
             
             return redirect()->route('trainer.login')->with('error', 'Please login to continue.');
         }
-        
         return $next($request);
     }
 
