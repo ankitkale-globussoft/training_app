@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Web\Admin\AdminController;
+use App\Http\Controllers\Web\Admin\AuthController as AdminAuthController;
+use App\Http\Controllers\Web\Admin\ProgramController;
 use App\Http\Controllers\Web\Trainer\AuthController as TrainerAuthController;
 use App\Http\Controllers\Web\Trainer\TrainerController;
 use Illuminate\Support\Facades\Route;
@@ -11,8 +14,15 @@ Route::get('trainer/signup', function () {
 });
 
 // Admin Routes -- 
-Route::prefix('admin')->name('admin.')->group(function(){ 
-    // add admin routes here...
+Route::prefix('admin')->name('admin.')->group(function(){
+    Route::get('login', [AdminAuthController::class, 'show_login'])->name('login');
+    Route::post('login', [AdminAuthController::class, 'login'])->name('login');
+
+    // Admin protected routes
+    Route::middleware(['admin'])->group(function () {
+        Route::get('dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+        Route::resource('program', ProgramController::class);
+    });
 });
 
 // Trainer Routes --

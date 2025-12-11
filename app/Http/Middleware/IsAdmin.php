@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -24,7 +25,7 @@ class IsAdmin
                 ], 403);
             }
             // for web 
-            return redirect()->route('login')->with('error', 'Unauthorized access');
+            return redirect()->back()->with('error', 'Unauthorized access');
         }
 
         return $next($request);

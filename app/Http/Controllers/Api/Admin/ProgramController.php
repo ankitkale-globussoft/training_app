@@ -40,7 +40,7 @@ class ProgramController extends Controller
             'title'           => 'required|string|max:255|unique:programs,title',
             'duration'        => 'required|string|max:255',
             'program_type_id' => 'required|exists:program_types,id',
-            'cost'            => 'required|string|max:255',
+            'cost'            => 'required|numeric|min:0',
             'description'     => 'required|string|max:255',
             'image'           => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
         ]);

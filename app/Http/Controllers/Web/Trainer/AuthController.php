@@ -49,7 +49,6 @@ class AuthController extends Controller
         }
 
         $remember = (bool) $request->remember;
-
         Auth::guard('trainer_web')->login($trainer, $remember);
         $request->session()->regenerate();
 
