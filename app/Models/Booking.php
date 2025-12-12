@@ -9,8 +9,15 @@ class Booking extends Model
 {
     protected $primaryKey = 'booking_id';
     protected $fillable = [
-        'org_id', 'trainer_id', 'trainer_status', 'training_status', 'org_review',
-        'org_rating', 'payment_status', 'transaction_id'
+        'requirement_id',
+        'org_id',
+        'trainer_id',
+        'booking_status',
+        'amount',
+        'payment_status',
+        'transaction_id',
+        'org_review',
+        'org_rating',
     ];
 
     public function organization(): BelongsTo
@@ -21,5 +28,15 @@ class Booking extends Model
     public function trainer(): BelongsTo
     {
         return $this->belongsTo(Trainer::class, 'trainer_id', 'trainer_id');
+    }
+
+    public function requirement()
+    {
+        return $this->belongsTo(TrainingRequirement::class, 'requirement_id', 'requirement_id');
+    }
+
+    public function progress()
+    {
+        return $this->hasMany(BookingProgress::class, 'booking_id');
     }
 }

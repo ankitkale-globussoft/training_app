@@ -31,6 +31,9 @@
     <link rel="stylesheet" href="{{asset('theme-assets/assets/vendor/css/theme-default.css')}}" class="template-customizer-theme-css" />
     <link rel="stylesheet" href="{{asset('theme-assets/assets/css/demo.css')}}" />
 
+    <!-- Sweet Alert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!-- Vendors CSS -->
     <link rel="stylesheet" href="{{asset('theme-assets/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css')}}" />
 

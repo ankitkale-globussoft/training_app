@@ -34,12 +34,31 @@
             </ul>
         </li>
 
-        {{-- Quiz --}}
-        
+        {{-- Test --}}
+        <li class="menu-item {{ request()->routeIs('admin.test.*') ? 'active open' : '' }}">
+            <a href="#" class="menu-link menu-toggle"><i class="menu-icon tf-icons bx bx-box"></i>
+            <div data-i18n="Tests">Tests</div></a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ request()->routeIs('admin.test.index') ? 'active' : '' }}">
+                    <a href="{{ route('admin.test.index') }}" class="menu-link"><i class="menu-icon tf-icons bx bx-home-circle"></i>
+                    <div data-i18n="All Tests">All Tests</div></a>
+                </li>
+                <li class="menu-item {{ request()->routeIs('admin.test.create') ? 'active' : '' }}">
+                    <a href="{{ route('admin.test.create') }}" class="menu-link"><i class="menu-icon tf-icons bx bx-home-circle"></i>
+                    <div data-i18n="Create Test">Create Test</div></a>
+                </li>
+            </ul>
+        </li>
+
+        {{-- Payment --}}
+        <li class="menu-item {{ request()->routeIs('admin.payments') ? 'active' : '' }}">
+            <a href="{{ route('admin.payments') }}" class="menu-link"><i class="menu-icon tf-icons bx bx-home-circle"></i>
+            <div data-i18n="Payments">Payments</div></a>
+        </li>
 
         {{-- Trainers --}}
-        <li class="menu-item {{ request()->routeIs('admin.trainer') ? 'active' : '' }}">
-            <a href="#" class="menu-link"><i class="menu-icon tf-icons bx bx-home-circle"></i>
+        <li class="menu-item {{ request()->routeIs('admin.trainers') ? 'active' : '' }}">
+            <a href="{{ route('admin.trainers') }}" class="menu-link"><i class="menu-icon tf-icons bx bx-home-circle"></i>
             <div data-i18n="Trainers">Trainers</div></a>
         </li>
     </ul>

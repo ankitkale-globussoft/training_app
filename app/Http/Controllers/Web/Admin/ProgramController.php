@@ -125,12 +125,18 @@ class ProgramController extends Controller
             }
             // Save new image
             $validated['image'] = $request->file('image')->store('programs_images', 'public');
-        } else {
-            Storage::disk('public')->delete($program->image);
-            dd($validated);
-        }
+        } 
+        // else {
+        //     Storage::disk('public')->delete($program->image);
+        //     $program->image = null;
+        // }
 
         $program->update($validated);
+        return response()->json([
+            'success' => true,
+            'result'  => ['program' => $program],
+            'msg'     => 'Program updated successfully'
+        ], 201);
     }
 
     /**
