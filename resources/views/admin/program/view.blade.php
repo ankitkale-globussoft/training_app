@@ -11,7 +11,7 @@
 
             <div class="card-body p-2"> <!-- Adjusted padding here -->
 
-                <form method="GET" action="{{ route('program.index') }}" class="row g-2">
+                <form method="GET" action="{{ route('admin.program.index') }}" class="row g-2">
                     <!-- Reduced gutter between columns -->
 
                     <!-- Search -->
@@ -40,7 +40,7 @@
                         <button class="btn btn-primary me-2" type="submit">
                             <i class="ti ti-search"></i> Filter
                         </button>
-                        <a href="{{ route('program.index') }}" class="btn btn-secondary">
+                        <a href="{{ route('admin.program.index') }}" class="btn btn-secondary">
                             <i class="ti ti-refresh"></i> Reset
                         </a>
                     </div>
@@ -79,12 +79,12 @@
                                 <td class="text-center">
 
                                     <!-- View -->
-                                    <a href="{{ route('program.show', $prog->program_id) }}"
+                                    {{-- <a href="{{ route('admin.program.show', $prog->program_id) }}"
                                         class="btn btn-sm btn-info text-white" data-bs-toggle="tooltip" data-bs-offset="0,4"
                                         data-bs-placement="top" data-bs-html="true" title
                                         data-bs-original-title="<i class='fa-regular fa-eye' ></i> <span>View Program</span>">
                                         <i class="fa-regular fa-eye"></i>
-                                    </a>
+                                    </a> --}}
 
                                     <!-- Edit -->
                                     <a href="{{ route('admin.program.edit', $prog->program_id) }}" class="btn btn-sm btn-warning"

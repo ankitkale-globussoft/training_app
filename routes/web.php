@@ -5,32 +5,47 @@ use App\Http\Controllers\Web\Admin\AdminController;
 use App\Http\Controllers\Web\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Web\Admin\PaymentController;
 use App\Http\Controllers\Web\Admin\ProgramController;
+use App\Http\Controllers\Web\Admin\ProgramTypeController;
 use App\Http\Controllers\Web\Admin\TestController;
 use App\Http\Controllers\Web\Admin\TrainerController as AdminTrainerController;
 use App\Http\Controllers\Web\Trainer\AuthController as TrainerAuthController;
 use App\Http\Controllers\Web\Trainer\TrainerController;
+use App\Http\Controllers\Web\Trainer\TrainerProgramsController;
 use Illuminate\Support\Facades\Route;
 
 
-Route::get('trainer/signup', function () {
-    return view('trainer.signup');
-});
+Route::get('/', function(){
+    return view('home');
+})->name('home');
 
 // Admin Routes -- 
-Route::prefix('admin')->name('admin.')->group(function(){
+Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('login', [AdminAuthController::class, 'show_login'])->name('login');
     Route::post('login', [AdminAuthController::class, 'login'])->name('login');
 
     // Admin protected routes
     Route::middleware(['admin'])->group(function () {
+        
+        Route::get('profile', function(){
+            return view('admin.profile');
+        })->name('profile');
+        
+        Route::post('profile', [AdminAuthController::class, 'update'])->name('profile.update');
+
         Route::get('dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+
+        // program type
+        Route::resource('program-types', ProgramTypeController::class);
+        Route::get('program-types-list', [ProgramTypeController::class, 'list'])->name('program-types.list');
+
+        // program
         Route::resource('program', ProgramController::class);
 
         // trainers
         Route::get('trainers', [AdminTrainerController::class, 'view'])->name('trainers');
         Route::get('/trainers/list', [AdminTrainerController::class, 'list'])->name('trainers.list');
         Route::get('/trainers/{id}', [TrainerController::class, 'show'])->name('trainers.show');
-        
+
         // tests
         Route::resource('test', TestController::class);
 
@@ -44,14 +59,28 @@ Route::prefix('admin')->name('admin.')->group(function(){
 Route::prefix('trainer')->name('trainer.')->group(function () {
     Route::get('login', [TrainerAuthController::class, 'show_login'])->name('login');
     Route::post('login', [TrainerAuthController::class, 'login'])->name('login');
-    
+
     Route::get('register', [TrainerAuthController::class, 'show_register'])->name('register');
     Route::post('register', [TrainerAuthController::class, 'register'])->name('register');
-    
+
     // Trainer protected routes (requires auth + trainer role)
-    Route::middleware('trainer.web')->group(function(){
+    Route::middleware('trainer.web')->group(function () {
+
+        Route::get('profile', function(){
+            return view('trainer.profile');
+        })->name('profile');
+
+        Route::post('profile', [TrainerAuthController::class, 'update'])->name('profile.update');
+
         Route::get('dashboard', [TrainerController::class, 'dashboard'])->name('dashboard');
+
+        // Trainer Programs
+        Route::get('my-programs', [TrainerProgramsController::class, 'browse'])->name('programs.browse');
+        Route::get('my-programs/list', [TrainerProgramsController::class, 'list'])->name('programs.list');
+        Route::post('my-programs/select', [TrainerProgramsController::class, 'select'])->name('programs.select');
+        Route::delete('my-programs/remove', [TrainerProgramsController::class, 'remove'])->name('programs.remove');
+        Route::get('selected-programs', [TrainerProgramsController::class, 'index'])->name('programs.index');
+
         Route::get('logout', [TrainerAuthController::class, 'logout'])->name('logout');
     });
-
 });

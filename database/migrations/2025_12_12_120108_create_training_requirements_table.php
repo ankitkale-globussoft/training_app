@@ -43,7 +43,7 @@ return new class extends Migration
             $table->timestamps();
 
             // Foreign Key Constraints
-            $table->foreign('org_id')->references('org_id')->on('organisations')->onDelete('cascade');
+            $table->foreign('org_id')->references('org_id')->on('organizations')->onDelete('cascade');
             $table->foreign('program_id')->references('program_id')->on('programs')->onDelete('cascade');
             $table->foreign('accepted_trainer_id')->references('trainer_id')->on('trainers')->onDelete('set null');
         });

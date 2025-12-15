@@ -124,7 +124,101 @@ class AuthController extends Controller
         ], 201);
     }
 
-    public function logout(Request $request){
+    public function update(Request $request)
+    {
+        // IMPORTANT: fetch real model
+        $trainer = Trainer::findOrFail(Auth::guard('trainer_web')->user()->trainer_id);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:trainers,email,' . $trainer->id,
+            'phone' => 'required|digits:10|unique:trainers,phone,' . $trainer->id,
+
+            'addr_line1' => 'required|string|max:255',
+            'addr_line2' => 'nullable|string|max:255',
+            'city' => 'required|string|max:255',
+            'district' => 'required|string|max:255',
+            'state' => 'required|string|max:255',
+            'pincode' => 'required|digits:6',
+
+            'resume_link' => 'required|url|max:500',
+            'biodata' => 'required|string',
+            'achievements' => 'nullable|string',
+
+            'for_org_type' => 'required|in:school,corporate,both',
+            'training_mode' => 'required|in:online,offline,both',
+            'availability' => 'required|string|max:255',
+
+            'profile_pic' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'signed_form_pdf' => 'nullable|mimes:pdf|max:5120',
+
+            'password' => 'nullable|confirmed|min:6',
+            'old_password' => 'required_with:password',
+        ]);
+
+        /* =====================
+       PASSWORD
+    ===================== */
+        if ($request->filled('password')) {
+            if (!Hash::check($request->old_password, $trainer->password)) {
+                return response()->json([
+                    'errors' => [
+                        'old_password' => ['Old password is incorrect']
+                    ]
+                ], 422);
+            }
+            $trainer->password = bcrypt($request->password);
+        }
+
+        /* =====================
+       FILE UPLOADS
+    ===================== */
+        if ($request->hasFile('profile_pic')) {
+            if ($trainer->profile_pic && Storage::disk('public')->exists($trainer->profile_pic)) {
+                Storage::disk('public')->delete($trainer->profile_pic);
+            }
+            $trainer->profile_pic =
+                $request->file('profile_pic')->store('trainer_profile_pics', 'public');
+        }
+
+        if ($request->hasFile('signed_form_pdf')) {
+            if ($trainer->signed_form_pdf && Storage::disk('public')->exists($trainer->signed_form_pdf)) {
+                Storage::disk('public')->delete($trainer->signed_form_pdf);
+            }
+            $trainer->signed_form_pdf =
+                $request->file('signed_form_pdf')->store('trainer_signed_forms', 'public');
+        }
+
+        /* =====================
+       MANUAL FIELD ASSIGN
+    ===================== */
+        $trainer->name          = $request->name;
+        $trainer->email         = $request->email;
+        $trainer->phone         = $request->phone;
+        $trainer->addr_line1    = $request->addr_line1;
+        $trainer->addr_line2    = $request->addr_line2;
+        $trainer->city          = $request->city;
+        $trainer->district      = $request->district;
+        $trainer->state         = $request->state;
+        $trainer->pincode       = $request->pincode;
+        $trainer->resume_link   = $request->resume_link;
+        $trainer->biodata       = $request->biodata;
+        $trainer->achievements  = $request->achievements;
+        $trainer->for_org_type  = $request->for_org_type;
+        $trainer->training_mode = $request->training_mode;
+        $trainer->availability  = $request->availability;
+
+        // ✅ REAL ELOQUENT SAVE
+        $trainer->save();
+
+        return response()->json([
+            'message' => 'Trainer profile updated successfully'
+        ]);
+    }
+
+
+    public function logout(Request $request)
+    {
         Auth::guard('trainer_web')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

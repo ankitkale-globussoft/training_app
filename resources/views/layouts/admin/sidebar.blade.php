@@ -15,7 +15,7 @@
         </li>
 
         {{-- programs --}}
-        <li class="menu-item {{ request()->routeIs('admin.program.*') ? 'active open' : '' }}">
+        <li class="menu-item {{ (request()->routeIs('admin.program.*') || request()->routeIs('admin.program-types.*')) ? 'active open' : '' }}">
             <a href="#" class="menu-link menu-toggle"><i class="menu-icon tf-icons bx bx-box"></i>
             <div data-i18n="Programs">Programs</div></a>
             <ul class="menu-sub">
@@ -27,8 +27,8 @@
                     <a href="{{ route('admin.program.create') }}" class="menu-link"><i class="menu-icon tf-icons bx bx-home-circle"></i>
                     <div data-i18n="All Programs">Add Program</div></a>
                 </li>
-                <li class="menu-item">
-                    <a href="#" class="menu-link"><i class="menu-icon tf-icons bx bx-home-circle"></i>
+                <li class="menu-item {{ request()->routeIs('admin.program-types.index') ? 'active' : '' }}">
+                    <a href="{{ route('admin.program-types.index') }}" class="menu-link"><i class="menu-icon tf-icons bx bx-home-circle"></i>
                     <div data-i18n="Program Types">Program Types</div></a>
                 </li>
             </ul>

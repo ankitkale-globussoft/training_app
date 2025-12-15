@@ -9,13 +9,25 @@
     <div class="menu-inner-shadow"></div>
 
     <ul class="menu-inner py-1">
-        <li class="menu-item active">
-            <a href="#" class="menu-link"><i class="menu-icon tf-icons bx bx-home-circle"></i>
+        <li class="menu-item {{ request()->routeIs('trainer.dashboard') ? 'active' : '' }}">
+            <a href="{{ route('trainer.dashboard') }}" class="menu-link"><i class="menu-icon tf-icons bx bx-home-circle"></i>
             <div data-i18n="Dashboard">Dashboard</div></a>
         </li>
-        <li class="menu-item">
-            <a href="#" class="menu-link"><i class="menu-icon tf-icons bx bx-home-circle"></i>
-            <div data-i18n="Programs">Programs</div></a>
+
+        {{-- Programs --}}
+        <li class="menu-item {{ request()->routeIs('trainer.programs.*') ? 'active open' : '' }}">
+            <a href="#" class="menu-link menu-toggle"><i class="menu-icon tf-icons bx bx-box"></i>
+            <div data-i18n="Trainings">Programs</div></a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ request()->routeIs('trainer.programs.browse') ? 'active' : '' }}">
+                    <a href="{{ route('trainer.programs.browse') }}" class="menu-link"><i class="menu-icon tf-icons bx bx-home-circle"></i>
+                    <div data-i18n="All Programs">All Programs</div></a>
+                </li>
+                <li class="menu-item {{ request()->routeIs('trainer.programs.index') ? 'active' : '' }}">
+                    <a href="{{ route('trainer.programs.index') }}" class="menu-link"><i class="menu-icon tf-icons bx bx-home-circle"></i>
+                    <div data-i18n="My Programs">My Programs</div></a>
+                </li>
+            </ul>
         </li>
 
         {{-- Trainings --}}
@@ -35,7 +47,7 @@
         </li>
 
         {{-- Tests --}}
-        <li class="menu-item">{{-- 'active open' if want to show the active state of dropdown --}}
+        {{-- <li class="menu-item">
             <a href="#" class="menu-link menu-toggle"><i class="menu-icon tf-icons bx bx-box"></i>
             <div data-i18n="Tests">Tests</div></a>
             <ul class="menu-sub">
@@ -48,6 +60,6 @@
                     <div data-i18n="Add Question">Add Question</div></a>
                 </li>
             </ul>
-        </li>
+        </li> --}}
     </ul>
 </aside>
