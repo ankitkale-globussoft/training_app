@@ -13,6 +13,7 @@ use App\Http\Controllers\Web\Org\ProgramsController;
 use App\Http\Controllers\Web\Trainer\AuthController as TrainerAuthController;
 use App\Http\Controllers\Web\Trainer\TrainerController;
 use App\Http\Controllers\Web\Trainer\TrainerProgramsController;
+use App\Http\Controllers\Web\Trainer\TrainingsController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TestMail;
@@ -89,6 +90,11 @@ Route::prefix('trainer')->name('trainer.')->group(function () {
         Route::post('my-programs/select', [TrainerProgramsController::class, 'select'])->name('programs.select');
         Route::delete('my-programs/remove', [TrainerProgramsController::class, 'remove'])->name('programs.remove');
         Route::get('selected-programs', [TrainerProgramsController::class, 'index'])->name('programs.index');
+
+        // Trainings
+        Route::get('open-trainings', [TrainingsController::class, 'open_trainings'])->name('trainings.open');
+        Route::post('/trainings/accept', [TrainingsController::class, 'acceptTraining'])->name('trainings.accept');
+
 
         Route::get('logout', [TrainerAuthController::class, 'logout'])->name('logout');
     });

@@ -31,10 +31,14 @@
         </li>
 
         {{-- Trainings --}}
-        <li class="menu-item">{{-- 'active open' if want to show the active state of dropdown --}}
+        <li class="menu-item {{ request()->routeIs('trainer.trainings.*') ? 'active open' : '' }}">
             <a href="#" class="menu-link menu-toggle"><i class="menu-icon tf-icons bx bx-box"></i>
             <div data-i18n="Trainings">Trainings</div></a>
             <ul class="menu-sub">
+                <li class="menu-item {{ request()->routeIs('trainer.trainings.open') ? 'active' : '' }}">
+                    <a href="{{ route('trainer.trainings.open') }}" class="menu-link"><i class="menu-icon tf-icons bx bx-home-circle"></i>
+                    <div data-i18n="Upcomming">Open Requests</div></a>
+                </li>
                 <li class="menu-item">
                     <a href="#" class="menu-link"><i class="menu-icon tf-icons bx bx-home-circle"></i>
                     <div data-i18n="Upcomming">Upcomming</div></a>

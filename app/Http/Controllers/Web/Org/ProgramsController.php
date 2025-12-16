@@ -55,7 +55,6 @@ class ProgramsController extends Controller
         return view('organisation.programs.index', compact('programs', 'programTypes'));
     }
 
-
     public function show($id)
     {
         $program = Program::with(['programType', 'trainers'])
@@ -95,7 +94,6 @@ class ProgramsController extends Controller
             'message' => 'Program request submitted successfully!'
         ]);
     }
-
 
     public function show_requestedPrograms(Request $request)
     {
