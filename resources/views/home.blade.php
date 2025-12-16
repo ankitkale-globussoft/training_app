@@ -8,5 +8,6 @@
 </head>
 <body> 
     <h1 style="margin: auto">HI this is homepage</h1>
+    <a href="{{ route('org.register') }}">register org</a>
 </body>
 </html>

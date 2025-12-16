@@ -15,7 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => \App\Http\Middleware\IsAdmin::class,
             'trainer.api' => \App\Http\Middleware\IsTrainer::class,
-            'trainer.web' => \App\Http\Middleware\IsTrainerWeb::class
+            'trainer.web' => \App\Http\Middleware\IsTrainerWeb::class,
+            'org.web' => \App\Http\Middleware\IsOrgWeb::class,
+            'org.api' => \App\Http\Middleware\IsOrgApi::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

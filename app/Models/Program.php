@@ -39,7 +39,19 @@ class Program extends Model
             'program_trainer',
             'program_id',
             'trainer_id'
-        )->withPivot('years_experience', 'rating', 'is_primary')
-          ->withTimestamps();
+        )->withTimestamps();
+
+        // return $this->belongsToMany(
+        //     Trainer::class,
+        //     'program_trainer',
+        //     'program_id',
+        //     'trainer_id'
+        // )->withPivot('years_experience', 'rating', 'is_primary')
+        //   ->withTimestamps();
+    }
+
+    public function trainingRequirements()
+    {
+        return $this->hasMany(TrainingRequirement::class, 'program_id');
     }
 }

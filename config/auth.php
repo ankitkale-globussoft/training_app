@@ -48,6 +48,14 @@ return [
             'driver' => 'session',
             'provider' => 'trainers',
         ],
+        'org_web' => [
+            'driver' => 'session',
+            'provider' => 'organizations'
+        ],
+        'org_api' => [
+            'driver' => 'sanctum',
+            'provider' => 'organizations'
+        ]
     ],
 
     /*
@@ -77,6 +85,11 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\Trainer::class,
         ],
+
+        'organizations' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Organization::class,
+        ]
 
         // 'users' => [
         //     'driver' => 'database',

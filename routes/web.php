@@ -8,13 +8,22 @@ use App\Http\Controllers\Web\Admin\ProgramController;
 use App\Http\Controllers\Web\Admin\ProgramTypeController;
 use App\Http\Controllers\Web\Admin\TestController;
 use App\Http\Controllers\Web\Admin\TrainerController as AdminTrainerController;
+use App\Http\Controllers\Web\Org\AuthController as OrgAuthController;
+use App\Http\Controllers\Web\Org\ProgramsController;
 use App\Http\Controllers\Web\Trainer\AuthController as TrainerAuthController;
 use App\Http\Controllers\Web\Trainer\TrainerController;
 use App\Http\Controllers\Web\Trainer\TrainerProgramsController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\TestMail;
 
 
-Route::get('/', function(){
+Route::get('/send-test-mail/{email}', function ($email) {
+    Mail::to($email)->send(new TestMail());
+    return "Mail sent successfully to $email!";
+});
+
+Route::get('/', function () {
     return view('home');
 })->name('home');
 
@@ -25,11 +34,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // Admin protected routes
     Route::middleware(['admin'])->group(function () {
-        
-        Route::get('profile', function(){
+
+        Route::get('profile', function () {
             return view('admin.profile');
         })->name('profile');
-        
+
         Route::post('profile', [AdminAuthController::class, 'update'])->name('profile.update');
 
         Route::get('dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
@@ -66,7 +75,7 @@ Route::prefix('trainer')->name('trainer.')->group(function () {
     // Trainer protected routes (requires auth + trainer role)
     Route::middleware('trainer.web')->group(function () {
 
-        Route::get('profile', function(){
+        Route::get('profile', function () {
             return view('trainer.profile');
         })->name('profile');
 
@@ -82,5 +91,34 @@ Route::prefix('trainer')->name('trainer.')->group(function () {
         Route::get('selected-programs', [TrainerProgramsController::class, 'index'])->name('programs.index');
 
         Route::get('logout', [TrainerAuthController::class, 'logout'])->name('logout');
+    });
+});
+
+
+// Organisation Routes
+Route::prefix('org')->name('org.')->group(function () {
+    Route::get('register', [OrgAuthController::class, 'showRegisterForm'])->name('register');
+    Route::post('register', [OrgAuthController::class, 'register'])->name('register.store');
+
+    Route::get('login', [OrgAuthController::class, 'showLoginForm'])->name('login');
+    Route::post('login', [OrgAuthController::class, 'login'])->name('login');
+
+    // Org protected routes
+    Route::middleware('org.web')->group(function () {
+        Route::get('home', function () {
+            return view('organisation.home');
+        })->name('home');
+
+        // programs
+        Route::get('programs', [ProgramsController::class, 'index'])->name('programs.index');
+        Route::get('/programs/{id}', [ProgramsController::class, 'show'])->name('programs.show');
+        Route::post('/programs/request', [ProgramsController::class, 'requestProgram'])->name('programs.request');
+
+        Route::get('requestedPrograms', [ProgramsController::class, 'show_requestedPrograms'])->name('programs.view.requested');
+        Route::delete('/programs/request/{id}', [ProgramsController::class, 'cancelRequest'])->name('programs.request.cancel');
+
+
+
+        Route::get('logout', [OrgAuthController::class, 'logout'])->name('logout');
     });
 });
