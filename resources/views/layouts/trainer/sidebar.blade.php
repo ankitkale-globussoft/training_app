@@ -39,8 +39,8 @@
                     <a href="{{ route('trainer.trainings.open') }}" class="menu-link"><i class="menu-icon tf-icons bx bx-home-circle"></i>
                     <div data-i18n="Upcomming">Open Requests</div></a>
                 </li>
-                <li class="menu-item">
-                    <a href="#" class="menu-link"><i class="menu-icon tf-icons bx bx-home-circle"></i>
+                <li class="menu-item {{ request()->routeIs('trainer.trainings.upcomming') ? 'active' : '' }}"">
+                    <a href="{{ route('trainer.trainings.upcomming') }}" class="menu-link"><i class="menu-icon tf-icons bx bx-home-circle"></i>
                     <div data-i18n="Upcomming">Upcomming</div></a>
                 </li>
                 <li class="menu-item">

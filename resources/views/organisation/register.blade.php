@@ -146,7 +146,7 @@
 
                         <p class="text-center mt-3">
                             <span>Already have an account?</span>
-                            <a href="{{ route('login') }}">Sign in</a>
+                            <a href="{{ route('org.login') }}">Sign in</a>
                         </p>
 
                     </div>

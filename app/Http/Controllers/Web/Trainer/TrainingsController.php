@@ -15,9 +15,9 @@ class TrainingsController extends Controller
         $trainerId = Auth::guard('trainer_web')->user()->trainer_id;
 
         $requirements = TrainingRequirement::with([
-                'program.programType',
-                'organisation'
-            ])
+            'program.programType',
+            'organisation'
+        ])
             ->where('status', 'open')
             ->whereNull('accepted_trainer_id')
             ->latest()
@@ -47,7 +47,7 @@ class TrainingsController extends Controller
         }
 
         $req->update([
-            'status' => 'accepted',
+            'status' => 'pending_payment',
             'accepted_trainer_id' => $trainerId
         ]);
 
@@ -57,4 +57,31 @@ class TrainingsController extends Controller
         ]);
     }
 
+    public function upcomming(Request $request)
+    {
+        return view('trainer.trainings.upcoming');
+    }
+
+    public function list(Request $request)
+    {
+        $trainerId = Auth::guard('trainer_web')->user()->trainer_id;
+
+        $query = TrainingRequirement::with(['organisation', 'program'])
+            ->where('accepted_trainer_id', $trainerId);
+
+        // Tab based filtering
+        if ($request->type === 'assigned') {
+            $query->where('status', 'assigned');
+        }
+
+        if ($request->type === 'payment_pending') {
+            $query->where('status', 'pending_payment');
+        }
+
+        if ($request->type === 'cancelled') {
+            $query->where('status', 'cancelled');
+        }
+
+        return $query->latest()->paginate(10);
+    }
 }

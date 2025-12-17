@@ -112,4 +112,11 @@ class AuthController extends Controller
             'message' => 'Profile updated successfully'
         ]);
     }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->regenerateToken();
+        return redirect()->route('admin.login')->with('success', 'Logged out successfully');
+    }
 }

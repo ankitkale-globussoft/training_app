@@ -61,6 +61,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // payments
         Route::get('payments', [PaymentController::class, 'view'])->name('payments');
+
+        Route::get('logout', [AdminAuthController::class, 'logout'])->name('logout');
     });
 });
 
@@ -94,6 +96,9 @@ Route::prefix('trainer')->name('trainer.')->group(function () {
         // Trainings
         Route::get('open-trainings', [TrainingsController::class, 'open_trainings'])->name('trainings.open');
         Route::post('/trainings/accept', [TrainingsController::class, 'acceptTraining'])->name('trainings.accept');
+        Route::get('upcomming-trainings', [TrainingsController::class, 'upcomming'])->name('trainings.upcomming');
+        Route::get('upcomming-trainings/list', [TrainingsController::class, 'list'])->name('trainings.upcomming.list');
+
 
 
         Route::get('logout', [TrainerAuthController::class, 'logout'])->name('logout');
@@ -123,7 +128,9 @@ Route::prefix('org')->name('org.')->group(function () {
         Route::get('requestedPrograms', [ProgramsController::class, 'show_requestedPrograms'])->name('programs.view.requested');
         Route::delete('/programs/request/{id}', [ProgramsController::class, 'cancelRequest'])->name('programs.request.cancel');
 
-
+        // payment
+        Route::post('/programs/payment/initiate', [ProgramsController::class, 'initiatePayment'])->name('programs.payment.initiate');
+        Route::post('/programs/payment/verify', [ProgramsController::class, 'verifyPayment'])->name('programs.payment.verify');
 
         Route::get('logout', [OrgAuthController::class, 'logout'])->name('logout');
     });
