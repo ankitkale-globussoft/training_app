@@ -48,7 +48,7 @@
                                 <li class="mb-1">
                                     <i class="bx bx-time-five"></i>
                                     <strong>Duration:</strong>
-                                    {{ $req->program->duration }} months
+                                    {{ $req->program->duration }}
                                 </li>
                                 <li class="mb-1">
                                     <i class="bx bx-dollar"></i>
@@ -79,7 +79,7 @@
                                     </li>
                                 @endif
                             </ul>
-
+                            
                             <div class="mt-auto">
                                 @if(($req->status ?? 'pending') === 'pending_payment' || $hasFailedPayment)
                                     <button class="btn btn-success w-100 mb-2"
@@ -89,7 +89,7 @@
                                     </button>
                                 @endif
                                 
-                                @if(in_array($req->status ?? 'pending', ['pending', 'pending_payment']) || $hasFailedPayment)
+                                @if(in_array($req->status ?? 'pending', ['pending', 'pending_payment', 'open']) || $hasFailedPayment)
                                     <button class="btn btn-outline-danger w-100"
                                         onclick="cancelRequest({{ $req->requirement_id }})">
                                         <i class="bx bx-x-circle"></i> Cancel Request

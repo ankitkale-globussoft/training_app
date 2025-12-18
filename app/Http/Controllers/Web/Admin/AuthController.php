@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Carbon\Carbon;
+use Illuminate\Validation\Rule;
 
 class AuthController extends Controller
 {
@@ -71,8 +76,8 @@ class AuthController extends Controller
         ]);
 
         /* =====================
-       PASSWORD UPDATE
-    ===================== */
+        PASSWORD UPDATE
+        ===================== */
         if ($request->filled('password')) {
             if (!Hash::check($request->old_password, $user->password)) {
                 return response()->json([
@@ -84,8 +89,8 @@ class AuthController extends Controller
         }
 
         /* =====================
-       IMAGE UPLOAD (FIXED)
-    ===================== */
+        IMAGE UPLOAD (FIXED)
+        ===================== */
         if ($request->hasFile('profile_pic')) {
 
             // Delete old image
@@ -99,8 +104,8 @@ class AuthController extends Controller
         }
 
         /* =====================
-       UPDATE FIELDS
-    ===================== */
+        UPDATE FIELDS
+        ===================== */
         $user->name  = $request->name;
         $user->email = $request->email;
         $user->phone = $request->phone;
@@ -118,5 +123,102 @@ class AuthController extends Controller
         Auth::logout();
         $request->session()->regenerateToken();
         return redirect()->route('admin.login')->with('success', 'Logged out successfully');
+    }
+
+    public function viewforgotPassword()
+    {
+        return view('admin.forgot-pass');
+    }
+
+    public function sendResetLink(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => [
+                'required',
+                'email',
+                Rule::exists('users', 'email')->where(function ($query) {
+                    $query->where('user_type', 'admin');
+                }),
+            ],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors'  => $validator->errors(),
+                'msg'     => 'Validation failed'
+            ], 422);
+        }
+
+        $token = Str::random(64);
+
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $request->email],
+            [
+                'token' => Hash::make($token),
+                'created_at' => Carbon::now()
+            ]
+        );
+
+        $resetLink = url('/admin/reset-password/' . $token . '?email=' . $request->email);
+
+        Mail::send('emails.reset-password', ['link' => $resetLink], function ($message) use ($request) {
+            $message->to($request->email);
+            $message->subject('Reset Your Password');
+        });
+
+        return redirect()->route('trainer.login')->with('success', 'Password reset link sent to your email.');
+    }
+
+    public function showResetForm(Request $request, $token)
+    {
+        return view('admin.reset-pass', [
+            'token' => $token,
+            'email' => $request->email
+        ]);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => [
+                'required',
+                'email',
+                Rule::exists('users', 'email')->where(function ($query) {
+                    $query->where('user_type', 'admin');
+                }),
+            ],
+            'password' => 'required|min:8|confirmed',
+            'token' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors'  => $validator->errors(),
+                'msg'     => 'Validation failed'
+            ], 422);
+        }
+
+        $record = DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->first();
+
+        if (!$record || !Hash::check($request->token, $record->token)) {
+            return response()->json([
+                'errors' => [
+                    'token' => ['Token expired, retry forgot password']
+                ]
+            ], 422);
+        }
+
+        User::where('email', $request->email)
+            ->update(['password' => Hash::make($request->password)]);
+
+        DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->delete();
+
+        return redirect('/admin/login')->with('success', 'Password reset successfully.');
     }
 }

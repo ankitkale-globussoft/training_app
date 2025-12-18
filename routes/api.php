@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\Admin\ProgramController;
 use App\Http\Controllers\Api\Admin\ProgramTypesController;
+use App\Http\Controllers\Api\Org\AuthController as OrgAuthController;
 use App\Http\Controllers\Api\Trainer\TAuthController;
 use App\Http\Controllers\AuthController;
 use Faker\Guesser\Name;
@@ -17,7 +18,7 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
-    
+
     Route::resource('programtype', ProgramTypesController::class);
     Route::resource('program', ProgramController::class)->except(['show', 'index']);
 });
@@ -27,11 +28,22 @@ Route::post('trainer/login', [TAuthController::class, 'login']);
 Route::post('trainer/signup', [TAuthController::class, 'signup']);
 
 // Trainer protected routes (requires auth + trainer role)
-Route::middleware('auth:sanctum')->middleware('trainer.api')->group(function(){
-    Route::put('trainer/{id}', [TAuthController::class, 'update']);           // Edit trainer profile
-    Route::get('trainer/{id}', [TAuthController::class, 'show']);             // Get trainer profile
-    Route::delete('trainer/{id}', [TAuthController::class, 'destroy']);       // Delete trainer
-    Route::get('trainers', [TAuthController::class, 'index']);                // List all trainers
+Route::middleware('auth:sanctum')->middleware('trainer.api')->group(function () {
+    Route::put('trainer/{id}', [TAuthController::class, 'update']);
+    Route::get('trainer/{id}', [TAuthController::class, 'show']);
+    Route::delete('trainer/{id}', [TAuthController::class, 'destroy']);
+    Route::get('trainers', [TAuthController::class, 'index']);
+});
+
+// Organisation Routes
+Route::prefix('org/')->group(function () {
+    Route::post('login', [OrgAuthController::class, 'login']);
+    Route::post('register', [OrgAuthController::class, 'register']);
+
+    Route::middleware('auth:sanctum')->middleware('org.api')->group(function () {
+        // Organisation Protected Routes
+        Route::post('profile/update', [OrgAuthController::class, 'update']);
+    });
 });
 
 // User routes

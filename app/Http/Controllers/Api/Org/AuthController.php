@@ -1,69 +1,58 @@
 <?php
 
-namespace App\Http\Controllers\Web\Org;
+namespace App\Http\Controllers\Api\Org;
 
 use App\Http\Controllers\Controller;
 use App\Models\Organization;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 
 class AuthController extends Controller
 {
-    public function showLoginForm()
-    {
-        return view('organisation.login');
-    }
-
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'login'    => 'required|string',
-            'password' => 'required|string'
+            'password' => 'required|string',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
+                'message' => 'Validation failed',
                 'errors'  => $validator->errors(),
-                'msg'     => 'Validation failed'
             ], 422);
         }
 
         $login = $request->input('login');
+
         $fieldType = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
 
-        // Find trainer by email or phone
         $org = Organization::where($fieldType, $login)->first();
 
         if (!$org || !Hash::check($request->password, $org->password)) {
             return response()->json([
                 'success' => false,
-                'errors' => [
-                    'login' => ['Invalid credentials.']
+                'message' => 'Login failed',
+                'errors'  => [
+                    'login' => ['Invalid credentials.'],
                 ],
-                'msg' => 'Login failed'
             ], 422);
         }
 
-
-        $remember = (bool) $request->remember;
-        Auth::guard('org_web')->login($org, $remember);
-        $request->session()->regenerate();
+        $token = $org->createToken('org-api-token')->plainTextToken;
 
         return response()->json([
             'success' => true,
-            'msg' => 'Login successful!',
-            'redirect' => route('org.home')
-        ]);
-    }
-
-    public function showRegisterForm()
-    {
-        return view('organisation.register');
+            'message' => 'Login successful',
+            'data' => [
+                'organization' => $org,
+                'token' => $token,
+                'token_type' => 'Bearer',
+            ],
+        ], 200);
     }
 
     public function register(Request $request)
@@ -90,8 +79,8 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
+                'message' => 'Validation failed',
                 'errors'  => $validator->errors(),
-                'msg'     => 'Validation failed'
             ], 422);
         }
 
@@ -99,29 +88,29 @@ class AuthController extends Controller
         $validated['password'] = bcrypt($validated['password']);
 
         if ($request->hasFile('org_image')) {
-            $validated['org_image'] = $request->file('org_image')->store('org_profile_pics', 'public');
+            $validated['org_image'] =
+                $request->file('org_image')->store('org_profile_pics', 'public');
         }
 
         $org = Organization::create($validated);
-        Auth::login($org);
-        $request->session()->regenerate();
+
+        $token = $org->createToken('org-api-token')->plainTextToken;
 
         return response()->json([
-            'success'  => true,
-            'msg'      => 'Organisation registered successfully',
-            'redirect' => route('org.home')
+            'success' => true,
+            'message' => 'Organisation registered successfully',
+            'data' => [
+                'organization' => $org,
+                'token' => $token,
+                'token_type' => 'Bearer',
+            ]
         ], 201);
-    }
-
-    public function profile()
-    {
-        $org = Auth::guard('org_web')->user();
-        return view('organisation.profile', compact('org'));
     }
 
     public function update(Request $request)
     {
-        $org = Organization::findOrFail(Auth::guard('org_web')->user()->org_id);
+        dd("coming");
+        $org = $request->user(); // Organization model
 
         $validator = Validator::make($request->all(), [
             'name'            => 'required|string|max:255',
@@ -150,16 +139,16 @@ class AuthController extends Controller
                 'errors'  => $validator->errors(),
             ], 422);
         }
-        
+
         $data = $validator->validated();
 
-        /* Password Update */
+        /* Password Update (unchanged logic) */
         if (!empty($data['password'])) {
             if (!Hash::check($data['old_password'], $org->password)) {
                 return response()->json([
                     'errors' => [
-                        'old_password' => ['Old password is incorrect']
-                    ]
+                        'old_password' => ['Old password is incorrect'],
+                    ],
                 ], 422);
             }
             $data['password'] = bcrypt($data['password']);
@@ -167,7 +156,7 @@ class AuthController extends Controller
             unset($data['password'], $data['old_password']);
         }
 
-        /* Image Upload */
+        /* Image Upload (unchanged) */
         if ($request->hasFile('org_image')) {
             $data['org_image'] = $request->file('org_image')
                 ->store('org_profile_pics', 'public');
@@ -177,16 +166,7 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'msg' => 'Profile updated successfully'
+            'msg' => 'Profile updated successfully',
         ]);
-    }
-
-
-    public function logout(Request $request)
-    {
-        Auth::guard('org_web')->logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        return redirect()->route('org.login')->with('success', 'Logged out successfully');
     }
 }

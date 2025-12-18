@@ -30,6 +30,12 @@ Route::get('/', function () {
 
 // Admin Routes -- 
 Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('forgot-pass', [AdminAuthController::class, 'viewforgotPassword'])->name('forgot-pass');
+    Route::post('forgot-pass', [AdminAuthController::class, 'sendResetLink'])->name('forgot-pass');
+
+    Route::get('/reset-password/{token}', [AdminAuthController::class, 'showResetForm'])->name('password.reset');
+    Route::post('/reset-password', [AdminAuthController::class, 'resetPassword'])->name('password.update');
+
     Route::get('login', [AdminAuthController::class, 'show_login'])->name('login');
     Route::post('login', [AdminAuthController::class, 'login'])->name('login');
 
@@ -61,7 +67,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // payments
         Route::get('payments', [PaymentController::class, 'view'])->name('payments');
-
+        Route::get('/payments/data', [PaymentController::class, 'getPaymentsData'])->name('payments.data');
+        Route::get('/payments/{id}', [PaymentController::class, 'showPaymentDetails'])->name('payments.details');
+        
         Route::get('logout', [AdminAuthController::class, 'logout'])->name('logout');
     });
 });
@@ -119,6 +127,10 @@ Route::prefix('org')->name('org.')->group(function () {
         Route::get('home', function () {
             return view('organisation.home');
         })->name('home');
+
+        // profile
+        Route::get('profile', [OrgAuthController::class, 'profile'])->name('profile');
+        Route::post('profile/update', [OrgAuthController::class, 'update'])->name('profile.update');
 
         // programs
         Route::get('programs', [ProgramsController::class, 'index'])->name('programs.index');

@@ -15,8 +15,8 @@ class IsOrgApi
      */
     public function handle(Request $request, Closure $next): Response
     {
-        dd("org api middleware");
         $user = $request->user();
+        dd($user);
         return $next($request);
     }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\TrainingRequirement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 
 class TrainingsController extends Controller
@@ -50,6 +51,12 @@ class TrainingsController extends Controller
             'status' => 'pending_payment',
             'accepted_trainer_id' => $trainerId
         ]);
+
+        $link = url('/org/requestedPrograms');
+        Mail::send('emails.request-accepted', ['link' => $link], function($message) {
+           $message->to();
+           $message->subject('Training Request Accepted'); 
+        });
 
         return response()->json([
             'status' => true,

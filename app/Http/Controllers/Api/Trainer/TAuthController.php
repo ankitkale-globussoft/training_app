@@ -180,11 +180,12 @@ class TAuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'result'  => [
+            'data'  => [
+                'trainer' => $trainer,
                 'token'   => $token,
-                'trainer' => $trainer
+                'token_type' => 'Bearer'
             ],
-            'msg'     => 'Trainer signup successful'
+            'message'     => 'Trainer signup successful'
         ], 201);
     }
 
@@ -244,11 +245,12 @@ class TAuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'result'  => [
+            'message'     => 'Trainer signup successful',
+            'data'  => [
                 'token'   => $token,
-                'trainer' => $trainer
+                'trainer' => $trainer,
+                'token_type' => 'Bearer'
             ],
-            'msg'     => 'Trainer signup successful'
         ], 201);
     }
 
@@ -269,8 +271,8 @@ class TAuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'result'  => $trainer,
-            'msg'     => 'Trainer fetched successfully'
+            'message'     => 'Trainer fetched successfully',
+            'data'  => $trainer
         ], 200);
     }
 
@@ -326,7 +328,7 @@ class TAuthController extends Controller
             return response()->json([
                 'success' => false,
                 'errors'  => $validator->errors(),
-                'msg'     => 'Validation failed'
+                'message'     => 'Validation failed'
             ], 422);
         }
 
@@ -365,7 +367,7 @@ class TAuthController extends Controller
         return response()->json([
             'success' => true,
             'result'  => $trainer,
-            'msg'     => 'Trainer updated successfully'
+            'message'     => 'Trainer updated successfully'
         ], 200);
     }
 
@@ -380,7 +382,7 @@ class TAuthController extends Controller
         if (!$trainer) {
             return response()->json([
                 'success' => false,
-                'msg'     => 'Trainer not found'
+                'message'     => 'Trainer not found'
             ], 404);
         }
 
@@ -397,7 +399,7 @@ class TAuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'msg'     => 'Trainer deleted successfully'
+            'message'     => 'Trainer deleted successfully'
         ], 200);
     }
 }

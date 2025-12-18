@@ -128,7 +128,6 @@
                                     @php
                                         $isRequested = $program->trainingRequirements->isNotEmpty();
                                     @endphp
-
                                     @if ($isRequested)
                                         <button type="button" class="btn btn-success w-100 mb-2" disabled>
                                             <i class="bx bx-check-circle"></i> Requested
