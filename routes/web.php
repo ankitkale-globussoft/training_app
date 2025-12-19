@@ -11,6 +11,7 @@ use App\Http\Controllers\Web\Admin\TrainerController as AdminTrainerController;
 use App\Http\Controllers\Web\Org\AuthController as OrgAuthController;
 use App\Http\Controllers\Web\Org\ProgramsController;
 use App\Http\Controllers\Web\Trainer\AuthController as TrainerAuthController;
+use App\Http\Controllers\Web\Trainer\ContentManagerController;
 use App\Http\Controllers\Web\Trainer\TrainerController;
 use App\Http\Controllers\Web\Trainer\TrainerProgramsController;
 use App\Http\Controllers\Web\Trainer\TrainingsController;
@@ -30,13 +31,13 @@ Route::get('/', function () {
 
 // Admin Routes -- 
 Route::prefix('admin')->name('admin.')->group(function () {
-    Route::get('forgot-pass', [AdminAuthController::class, 'viewforgotPassword'])->name('forgot-pass');
+    Route::get('forgot-pass', [AdminAuthController::class, 'viewforgotPassword'])->name('view-forgot-pass');
     Route::post('forgot-pass', [AdminAuthController::class, 'sendResetLink'])->name('forgot-pass');
 
     Route::get('/reset-password/{token}', [AdminAuthController::class, 'showResetForm'])->name('password.reset');
     Route::post('/reset-password', [AdminAuthController::class, 'resetPassword'])->name('password.update');
 
-    Route::get('login', [AdminAuthController::class, 'show_login'])->name('login');
+    Route::get('login', [AdminAuthController::class, 'show_login'])->name('view.login');
     Route::post('login', [AdminAuthController::class, 'login'])->name('login');
 
     // Admin protected routes
@@ -69,7 +70,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('payments', [PaymentController::class, 'view'])->name('payments');
         Route::get('/payments/data', [PaymentController::class, 'getPaymentsData'])->name('payments.data');
         Route::get('/payments/{id}', [PaymentController::class, 'showPaymentDetails'])->name('payments.details');
-        
+
         Route::get('logout', [AdminAuthController::class, 'logout'])->name('logout');
     });
 });
@@ -107,6 +108,13 @@ Route::prefix('trainer')->name('trainer.')->group(function () {
         Route::get('upcomming-trainings', [TrainingsController::class, 'upcomming'])->name('trainings.upcomming');
         Route::get('upcomming-trainings/list', [TrainingsController::class, 'list'])->name('trainings.upcomming.list');
 
+        // Content Manager 
+        Route::get('content-manager', [ContentManagerController::class, 'index'])->name('content-manager');
+        Route::get('/content-manager/add/{booking_id}', [ContentManagerController::class, 'add'])->name('content.add');
+        Route::get('/content-manager/booking/{booking_id}', [ContentManagerController::class, 'getBookingDetails']);
+        Route::get('/content-manager/modules/{booking_id}', [ContentManagerController::class, 'getModules']);
+        Route::post('/content-manager/store', [ContentManagerController::class, 'store'])->name('content.store');
+        Route::delete('/content-manager/{id}', [ContentManagerController::class, 'destroy'])->name('content.destroy');
 
 
         Route::get('logout', [TrainerAuthController::class, 'logout'])->name('logout');

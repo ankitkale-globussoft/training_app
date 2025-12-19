@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Org;
 use App\Http\Controllers\Controller;
 use App\Models\Organization;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -109,9 +110,7 @@ class AuthController extends Controller
 
     public function update(Request $request)
     {
-        dd("coming");
-        $org = $request->user(); // Organization model
-
+        $org = Organization::findOrFail(Auth::guard('org_web')->user()->org_id);
         $validator = Validator::make($request->all(), [
             'name'            => 'required|string|max:255',
             'rep_designation' => 'required|string|max:255',

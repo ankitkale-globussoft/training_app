@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -14,11 +15,27 @@ class Trainer extends Authenticatable
     use HasFactory, Notifiable, HasApiTokens;
 
     protected $primaryKey = 'trainer_id';
-    
+
     protected $fillable = [
-        'name', 'email', 'password', 'phone', 'addr_line1', 'addr_line2', 'city', 'state', 'district',
-        'pincode', 'resume_link', 'profile_pic', 'biodata', 'achievements',
-        'for_org_type', 'availability', 'training_mode', 'signed_form_pdf', 'verified'
+        'name',
+        'email',
+        'password',
+        'phone',
+        'addr_line1',
+        'addr_line2',
+        'city',
+        'state',
+        'district',
+        'pincode',
+        'resume_link',
+        'profile_pic',
+        'biodata',
+        'achievements',
+        'for_org_type',
+        'availability',
+        'training_mode',
+        'signed_form_pdf',
+        'verified'
     ];
 
     public function bookings(): HasMany
@@ -26,7 +43,6 @@ class Trainer extends Authenticatable
         return $this->hasMany(Booking::class, 'trainer_id', 'trainer_id');
     }
 
-    // Add many-to-many relationship
     public function programs(): BelongsToMany
     {
         return $this->belongsToMany(
@@ -35,6 +51,11 @@ class Trainer extends Authenticatable
             'trainer_id',
             'program_id'
         )->withPivot('years_experience', 'rating', 'is_primary')
-          ->withTimestamps();
+            ->withTimestamps();
+    }
+
+    public function contents()
+    {
+        return $this->hasMany(TrainingContent::class, 'trainer_id', 'trainer_id');
     }
 }

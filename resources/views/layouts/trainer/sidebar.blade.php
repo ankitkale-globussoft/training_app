@@ -50,6 +50,12 @@
             </ul>
         </li>
 
+        {{-- Content Manager --}}
+        <li class="menu-item {{ request()->routeIs('trainer.content-manager') ? 'active' : '' }}">
+            <a href="{{ route('trainer.content-manager') }}" class="menu-link"><i class="menu-icon tf-icons bx bx-home-circle"></i>
+            <div data-i18n="Content Manager">Content Manager</div></a>
+        </li>
+
         {{-- Tests --}}
         {{-- <li class="menu-item">
             <a href="#" class="menu-link menu-toggle"><i class="menu-icon tf-icons bx bx-box"></i>

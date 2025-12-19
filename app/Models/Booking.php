@@ -39,4 +39,14 @@ class Booking extends Model
     {
         return $this->hasMany(BookingProgress::class, 'booking_id');
     }
+
+    public function contents()
+    {
+        return $this->hasMany(TrainingContent::class, 'booking_id', 'booking_id');
+    }
+
+    public function modules()
+    {
+        return $this->hasMany(ContentModule::class, 'booking_id', 'booking_id');
+    }
 }
