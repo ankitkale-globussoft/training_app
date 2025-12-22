@@ -19,8 +19,10 @@ class ProgramTypesController extends Controller
         $program_types = ProgramType::all();
         return response()->json([
             'success' => true,
-            'result'  => $program_types
-        ]);
+            'message' => 'Program types fetched successfully',
+            'data' => $program_types,
+            'status' => 200
+        ], 200);
     }
 
     /**
@@ -37,15 +39,15 @@ class ProgramTypesController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name'        => 'required|string|max:255|unique:program_types,name',
-            'description'        => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:program_types,name',
+            'description' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
         ]);
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors'  => $validator->errors(),
-                'msg'     => 'Validation failed'
+                'errors' => $validator->errors(),
+                'msg' => 'Validation failed'
             ], 422);
         }
         $validated = $validator->validated();
@@ -57,8 +59,9 @@ class ProgramTypesController extends Controller
         $programtype = ProgramType::create($validated);
         return response()->json([
             'success' => true,
-            'result'  => ['program' => $programtype],
-            'msg'     => 'Program created successfully'
+            'message' => 'Program type created successfully',
+            'data' => $programtype,
+            'status' => 201
         ], 201);
     }
 
@@ -68,10 +71,20 @@ class ProgramTypesController extends Controller
     public function show(string $id)
     {
         $program_type = ProgramType::find($id);
+        if (!$program_type) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Program type not found',
+                'data' => null,
+                'status' => 404
+            ], 404);
+        }
         return response()->json([
             'success' => true,
-            'result'  => $program_type
-        ]);
+            'message' => 'Program type details fetched successfully',
+            'data' => $program_type,
+            'status' => 200
+        ], 200);
     }
 
     /**
@@ -90,16 +103,16 @@ class ProgramTypesController extends Controller
         $programType = ProgramType::findOrFail($id);
 
         $validator = Validator::make($request->all(), [
-            'name'        => 'sometimes|required|string|max:255|unique:program_types,name,' . $programType->id,
+            'name' => 'sometimes|required|string|max:255|unique:program_types,name,' . $programType->id,
             'description' => 'sometimes|required|string|max:255',
-            'image'       => 'sometimes|nullable|image|mimes:jpg,jpeg,png|max:2048'
+            'image' => 'sometimes|nullable|image|mimes:jpg,jpeg,png|max:2048'
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors'  => $validator->errors(),
-                'msg'     => 'Validation failed'
+                'errors' => $validator->errors(),
+                'msg' => 'Validation failed'
             ], 422);
         }
 
@@ -119,8 +132,9 @@ class ProgramTypesController extends Controller
 
         return response()->json([
             'success' => true,
-            'result'  => ['program_type' => $programType],
-            'msg'     => 'Program type updated successfully'
+            'message' => 'Program type updated successfully',
+            'data' => $programType,
+            'status' => 200
         ], 200);
     }
 
@@ -138,7 +152,9 @@ class ProgramTypesController extends Controller
 
         return response()->json([
             'success' => true,
-            'msg'     => 'Program Type deleted successfully'
+            'message' => 'Program type deleted successfully',
+            'data' => null,
+            'status' => 200
         ], 200);
     }
 }

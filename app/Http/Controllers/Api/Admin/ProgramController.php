@@ -15,12 +15,14 @@ class ProgramController extends Controller
      */
     public function index()
     {
-        $program = Program::all();
+        $programs = Program::all();
 
         return response()->json([
             'success' => true,
-            'result' => $program
-        ]);
+            'message' => 'Programs fetched successfully',
+            'data' => $programs,
+            'status' => 200
+        ], 200);
     }
 
     /**
@@ -61,8 +63,9 @@ class ProgramController extends Controller
         $program = Program::create($validated);
         return response()->json([
             'success' => true,
-            'result' => ['program' => $program],
-            'msg' => 'Program created successfully'
+            'message' => 'Program created successfully',
+            'data' => $program,
+            'status' => 201
         ], 201);
     }
 
@@ -72,9 +75,19 @@ class ProgramController extends Controller
     public function show(string $id)
     {
         $program = Program::find($id);
+        if (!$program) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Program not found',
+                'data' => null,
+                'status' => 404
+            ], 404);
+        }
         return response()->json([
             'success' => true,
-            'result' => $program
+            'message' => 'Program details fetched successfully',
+            'data' => $program,
+            'status' => 200
         ], 200);
     }
 
@@ -123,8 +136,9 @@ class ProgramController extends Controller
 
         return response()->json([
             'success' => true,
-            'result' => ['program' => $program],
-            'msg' => 'Program updated successfully'
+            'message' => 'Program updated successfully',
+            'data' => $program,
+            'status' => 200
         ], 200);
 
     }
@@ -144,7 +158,9 @@ class ProgramController extends Controller
 
         return response()->json([
             'success' => true,
-            'msg' => 'Program deleted successfully'
+            'message' => 'Program deleted successfully',
+            'data' => null,
+            'status' => 200
         ], 200);
     }
 }
