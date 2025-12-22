@@ -72,6 +72,9 @@ class ProgramsController extends Controller
         $request->validate([
             'program_id' => 'required|integer',
             'mode' => 'required|in:online,offline',
+            'number_of_students' => 'required|integer|min:1',
+            'schedule_date' => 'required|date',
+            'schedule_time' => 'required|string',
         ]);
 
         $orgId = Auth::guard('org_web')->user()->org_id;
@@ -90,7 +93,10 @@ class ProgramsController extends Controller
         TrainingRequirement::create([
             'org_id' => $orgId,
             'program_id' => $request->program_id,
-            'mode' => $request->mode
+            'mode' => $request->mode,
+            'number_of_students' => $request->number_of_students,
+            'schedule_date' => $request->schedule_date,
+            'schedule_time' => $request->schedule_time
         ]);
 
         return response()->json([
@@ -119,10 +125,10 @@ class ProgramsController extends Controller
             ->where('org_id', $orgId)
             ->firstOrFail();
 
-            // Also delete any failed bookings associated with this requirement
-            Booking::where('requirement_id', $id)
-                ->where('payment_status', 'failed')
-                ->delete();
+        // Also delete any failed bookings associated with this requirement
+        Booking::where('requirement_id', $id)
+            ->where('payment_status', 'failed')
+            ->delete();
 
 
         $req->delete();
@@ -170,7 +176,9 @@ class ProgramsController extends Controller
             $api = new Api(config('services.razorpay.key'), config('services.razorpay.secret'));
 
             // Amount in paise (smallest currency unit)
-            $amountInPaise = $requirement->program->cost * 100;
+            // Price is per student
+            $totalAmount = $requirement->program->cost * $requirement->number_of_students;
+            $amountInPaise = $totalAmount * 100;
 
             // Create Razorpay Order
             $orderData = [
@@ -181,7 +189,8 @@ class ProgramsController extends Controller
                     'requirement_id' => $requirement->requirement_id,
                     'org_id' => $orgId,
                     'program_id' => $requirement->program_id,
-                    'program_title' => $requirement->program->title
+                    'program_title' => $requirement->program->title,
+                    'students' => $requirement->number_of_students
                 ]
             ];
 
@@ -193,7 +202,7 @@ class ProgramsController extends Controller
                 'org_id' => $orgId,
                 'trainer_id' => $requirement->accepted_trainer_id,
                 'booking_status' => 'assigned',
-                'amount' => $requirement->program->cost,
+                'amount' => $totalAmount,
                 'payment_status' => 'pending',
                 'transaction_id' => $razorpayOrder->id // Store order_id initially
             ]);

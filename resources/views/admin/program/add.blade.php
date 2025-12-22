@@ -41,10 +41,17 @@
                         </div>
 
                         {{-- Cost --}}
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Cost <span class="text-danger">*</span></label>
-                            <input type="text" id="cost" name="cost" class="form-control">
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Price Per Student <span class="text-danger">*</span></label>
+                            <input type="number" id="cost" name="cost" class="form-control" step="0.01">
                             <span class="invalid-feedback" id="error-cost"></span>
+                        </div>
+
+                        {{-- Min Students --}}
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Min. Students <span class="text-danger">*</span></label>
+                            <input type="number" id="min_students" name="min_students" class="form-control" value="1">
+                            <span class="invalid-feedback" id="error-min_students"></span>
                         </div>
 
                         {{-- Description --}}
@@ -84,14 +91,14 @@
 @endsection
 @push('ajax')
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
 
             // Image Preview
-            $('#image').on('change', function(e) {
+            $('#image').on('change', function (e) {
                 const file = e.target.files[0];
                 if (file) {
                     const reader = new FileReader();
-                    reader.onload = function(e) {
+                    reader.onload = function (e) {
                         $('#image_preview_img').attr('src', e.target.result);
                         $('#image_preview').removeClass('d-none');
                     };
@@ -100,13 +107,13 @@
             });
 
             // Remove Image
-            $('#remove_image').on('click', function() {
+            $('#remove_image').on('click', function () {
                 $('#image').val('');
                 $('#image_preview').addClass('d-none');
             });
 
             // Submit Form
-            $("#addProgramForm").on("submit", function(e) {
+            $("#addProgramForm").on("submit", function (e) {
                 e.preventDefault();
 
                 // Reset errors
@@ -115,7 +122,7 @@
 
                 // Loading state
                 $("#saveProgramBtn").html(
-                        '<span class="spinner-border spinner-border-sm me-1"></span> Saving...')
+                    '<span class="spinner-border spinner-border-sm me-1"></span> Saving...')
                     .prop("disabled", true);
 
                 let formData = new FormData(this);
@@ -127,9 +134,9 @@
                     processData: false,
                     contentType: false,
 
-                    success: function(response) {
+                    success: function (response) {
                         $("#saveProgramBtn").html(
-                                '<span class="bx bx-save me-1"></span> Save Program')
+                            '<span class="bx bx-save me-1"></span> Save Program')
                             .prop("disabled", false);
 
                         if (response.success === true) {
@@ -145,15 +152,15 @@
                         }
                     },
 
-                    error: function(xhr) {
+                    error: function (xhr) {
                         $("#saveProgramBtn").html(
-                                '<span class="bx bx-save me-1"></span> Save Program')
+                            '<span class="bx bx-save me-1"></span> Save Program')
                             .prop("disabled", false);
 
                         if (xhr.status === 422) {
                             let errors = xhr.responseJSON.errors;
 
-                            $.each(errors, function(key, value) {
+                            $.each(errors, function (key, value) {
                                 $('#' + key).addClass('is-invalid');
                                 $('#error-' + key).text(value[0]);
                             });

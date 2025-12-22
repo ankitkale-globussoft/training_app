@@ -27,8 +27,7 @@
                         <select name="program_type" class="form-select">
                             <option value="">All Types</option>
                             @foreach ($programTypes as $type)
-                                <option value="{{ $type->id }}"
-                                    {{ request('program_type') == $type->id ? 'selected' : '' }}>
+                                <option value="{{ $type->id }}" {{ request('program_type') == $type->id ? 'selected' : '' }}>
                                     {{ $type->name }}
                                 </option>
                             @endforeach
@@ -60,7 +59,8 @@
                             <th>Title</th>
                             <th>Type</th>
                             <th>Duration</th>
-                            <th>Cost</th>
+                            <th>Min. Students</th>
+                            <th>Price / Student</th>
                             <th>Created</th>
                             <th class="text-center">Actions</th>
                         </tr>
@@ -73,6 +73,7 @@
                                 <td>{{ $prog->title }}</td>
                                 <td>{{ $prog->programType->type_name ?? 'N/A' }}</td>
                                 <td>{{ $prog->duration }}</td>
+                                <td>{{ $prog->min_students }}</td>
                                 <td>₹{{ number_format($prog->cost, 2) }}</td>
                                 <td>{{ $prog->created_at->format('d M Y') }}</td>
 
@@ -87,17 +88,17 @@
                                     </a> --}}
 
                                     <!-- Edit -->
-                                    <a href="{{ route('admin.program.edit', $prog->program_id) }}" class="btn btn-sm btn-warning"
-                                        data-bs-toggle="tooltip" data-bs-offset="0,4" data-bs-placement="top"
-                                        data-bs-html="true" title
+                                    <a href="{{ route('admin.program.edit', $prog->program_id) }}"
+                                        class="btn btn-sm btn-warning" data-bs-toggle="tooltip" data-bs-offset="0,4"
+                                        data-bs-placement="top" data-bs-html="true" title
                                         data-bs-original-title="<i class='fa-regular fa-pen-to-square' ></i> <span>Edit Program</span>">
                                         <i class="fa-regular fa-pen-to-square"></i>
                                     </a>
 
                                     <!-- Delete -->
                                     <form action="{{ route('admin.program.destroy', $prog->program_id) }}" method="POST"
-                                        class="d-inline" data-bs-toggle="tooltip" data-bs-offset="0,4"
-                                        data-bs-placement="top" data-bs-html="true" title
+                                        class="d-inline" data-bs-toggle="tooltip" data-bs-offset="0,4" data-bs-placement="top"
+                                        data-bs-html="true" title
                                         data-bs-original-title="<i class='fa-solid fa-trash' ></i> <span>Delete Program</span>"
                                         onsubmit="return confirm('Are you sure to delete this?');">
                                         @csrf

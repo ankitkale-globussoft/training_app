@@ -20,11 +20,11 @@ class TrainerController extends Controller
         // Search
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%")
-                  ->orWhere('city', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->orWhere('city', 'like', "%{$search}%");
             });
         }
 
@@ -53,5 +53,32 @@ class TrainerController extends Controller
     {
         $trainer = Trainer::findOrFail($id);
         return response()->json($trainer);
+    }
+
+    public function verify($id)
+    {
+        $trainer = Trainer::findOrFail($id);
+        $trainer->verified = 'verified';
+        $trainer->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Trainer verified successfully.'
+        ]);
+    }
+
+    public function suspend($id)
+    {
+        $trainer = Trainer::findOrFail($id);
+        // Toggle between verified and suspended
+        $trainer->verified = ($trainer->verified === 'suspended') ? 'verified' : 'suspended';
+        $trainer->save();
+
+        $message = ($trainer->verified === 'suspended') ? 'Trainer suspended successfully.' : 'Trainer activated successfully.';
+
+        return response()->json([
+            'success' => true,
+            'message' => $message
+        ]);
     }
 }

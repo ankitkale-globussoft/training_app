@@ -48,11 +48,19 @@
                     </div>
 
                     {{-- Cost --}}
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Cost <span class="text-danger">*</span></label>
-                        <input type="text" id="cost" name="cost" class="form-control" 
-                               value="{{ $program->cost }}">
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Price Per Student <span class="text-danger">*</span></label>
+                        <input type="number" id="cost" name="cost" class="form-control" 
+                               value="{{ $program->cost }}" step="0.01">
                         <span class="invalid-feedback" id="error-cost"></span>
+                    </div>
+
+                    {{-- Min Students --}}
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Min. Students <span class="text-danger">*</span></label>
+                        <input type="number" id="min_students" name="min_students" class="form-control" 
+                               value="{{ $program->min_students }}">
+                        <span class="invalid-feedback" id="error-min_students"></span>
                     </div>
 
                     {{-- Description --}}

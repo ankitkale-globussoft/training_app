@@ -29,14 +29,14 @@ class PaymentController extends Controller
                 $query->where(function ($q) use ($search) {
                     $q->whereHas('organization', function ($orgQuery) use ($search) {
                         $orgQuery->where('name', 'like', "%{$search}%")
-                                 ->orWhere('email', 'like', "%{$search}%");
+                            ->orWhere('email', 'like', "%{$search}%");
                     })
-                    ->orWhereHas('trainer', function ($trainerQuery) use ($search) {
-                        $trainerQuery->where('name', 'like', "%{$search}%")
-                                    ->orWhere('email', 'like', "%{$search}%");
-                    })
-                    ->orWhere('transaction_id', 'like', "%{$search}%")
-                    ->orWhere('booking_id', 'like', "%{$search}%");
+                        ->orWhereHas('trainer', function ($trainerQuery) use ($search) {
+                            $trainerQuery->where('name', 'like', "%{$search}%")
+                                ->orWhere('email', 'like', "%{$search}%");
+                        })
+                        ->orWhere('transaction_id', 'like', "%{$search}%")
+                        ->orWhere('booking_id', 'like', "%{$search}%");
                 });
             }
 
@@ -75,8 +75,8 @@ class PaymentController extends Controller
             // Handle special sort cases
             if ($sortBy === 'org_name') {
                 $query->leftJoin('organizations', 'bookings.org_id', '=', 'organizations.org_id')
-                      ->select('bookings.*')
-                      ->orderBy('organizations.name', $sortOrder);
+                    ->select('bookings.*')
+                    ->orderBy('organizations.name', $sortOrder);
             } else {
                 $query->orderBy($sortBy, $sortOrder);
             }
@@ -89,15 +89,15 @@ class PaymentController extends Controller
             $stats = [
                 'total_records' => $payments->total(),
                 'total_amount' => Booking::when($request->filled('payment_status'), function ($q) use ($request) {
-                        return $q->where('payment_status', $request->payment_status);
-                    })
+                    return $q->where('payment_status', $request->payment_status);
+                })
                     ->when($request->filled('search'), function ($q) use ($request) {
                         $search = $request->search;
                         return $q->where(function ($subQ) use ($search) {
                             $subQ->whereHas('organization', function ($orgQuery) use ($search) {
                                 $orgQuery->where('name', 'like', "%{$search}%");
                             })
-                            ->orWhere('transaction_id', 'like', "%{$search}%");
+                                ->orWhere('transaction_id', 'like', "%{$search}%");
                         });
                     })
                     ->sum('amount')
@@ -124,7 +124,7 @@ class PaymentController extends Controller
                 'organization:org_id,name,email,mobile,org_image,addr_line1,city,state',
                 'trainer:trainer_id,name,email,phone,profile_pic',
                 'requirement' => function ($query) {
-                    $query->with('program:program_id,title,duration,cost');
+                    $query->with('program:program_id,title,duration,cost,min_students');
                 }
             ])->findOrFail($id);
 

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Program extends Model
 {
     protected $primaryKey = 'program_id';
-    protected $fillable = ['title', 'duration', 'cost', 'description', 'image', 'program_type_id'];
+    protected $fillable = ['title', 'duration', 'cost', 'description', 'image', 'program_type_id', 'min_students'];
 
     public function candidates(): HasMany
     {

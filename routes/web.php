@@ -10,8 +10,11 @@ use App\Http\Controllers\Web\Admin\TestController;
 use App\Http\Controllers\Web\Admin\TrainerController as AdminTrainerController;
 use App\Http\Controllers\Web\Org\AuthController as OrgAuthController;
 use App\Http\Controllers\Web\Org\ProgramsController;
+use App\Http\Controllers\Web\Org\ActiveProgramController;
+use App\Http\Controllers\Web\Org\PurchaseController;
 use App\Http\Controllers\Web\Trainer\AuthController as TrainerAuthController;
 use App\Http\Controllers\Web\Trainer\ContentManagerController;
+use App\Http\Controllers\Web\Trainer\DashboardController;
 use App\Http\Controllers\Web\Trainer\TrainerController;
 use App\Http\Controllers\Web\Trainer\TrainerProgramsController;
 use App\Http\Controllers\Web\Trainer\TrainingsController;
@@ -61,7 +64,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // trainers
         Route::get('trainers', [AdminTrainerController::class, 'view'])->name('trainers');
         Route::get('/trainers/list', [AdminTrainerController::class, 'list'])->name('trainers.list');
-        Route::get('/trainers/{id}', [TrainerController::class, 'show'])->name('trainers.show');
+        Route::get('/trainers/{id}', [AdminTrainerController::class, 'show'])->name('trainers.show');
+        Route::post('/trainers/{id}/verify', [AdminTrainerController::class, 'verify'])->name('trainers.verify');
+        Route::post('/trainers/{id}/suspend', [AdminTrainerController::class, 'suspend'])->name('trainers.suspend');
 
         // tests
         Route::resource('test', TestController::class);
@@ -93,7 +98,7 @@ Route::prefix('trainer')->name('trainer.')->group(function () {
 
         Route::post('profile', [TrainerAuthController::class, 'update'])->name('profile.update');
 
-        Route::get('dashboard', [TrainerController::class, 'dashboard'])->name('dashboard');
+        Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         // Trainer Programs
         Route::get('my-programs', [TrainerProgramsController::class, 'browse'])->name('programs.browse');
@@ -110,10 +115,13 @@ Route::prefix('trainer')->name('trainer.')->group(function () {
 
         // Content Manager 
         Route::get('content-manager', [ContentManagerController::class, 'index'])->name('content-manager');
+        Route::get('/content-manager/{booking_id}/manage', [ContentManagerController::class, 'manage'])->name('content.manage');
         Route::get('/content-manager/add/{booking_id}', [ContentManagerController::class, 'add'])->name('content.add');
+        Route::get('/content-manager/content/{content_id}/edit', [ContentManagerController::class, 'edit'])->name('content.edit');
+        Route::post('/content-manager/update', [ContentManagerController::class, 'update'])->name('content.update');
         Route::get('/content-manager/booking/{booking_id}', [ContentManagerController::class, 'getBookingDetails']);
-        Route::get('/content-manager/modules/{booking_id}', [ContentManagerController::class, 'getModules']);
         Route::post('/content-manager/store', [ContentManagerController::class, 'store'])->name('content.store');
+
         Route::delete('/content-manager/{id}', [ContentManagerController::class, 'destroy'])->name('content.destroy');
 
 
@@ -151,6 +159,15 @@ Route::prefix('org')->name('org.')->group(function () {
         // payment
         Route::post('/programs/payment/initiate', [ProgramsController::class, 'initiatePayment'])->name('programs.payment.initiate');
         Route::post('/programs/payment/verify', [ProgramsController::class, 'verifyPayment'])->name('programs.payment.verify');
+
+        // Active Programs
+        Route::get('active-programs', [ActiveProgramController::class, 'index'])->name('active-programs.index');
+        Route::get('active-programs/{booking_id}/content', [ActiveProgramController::class, 'viewContent'])->name('active-programs.content');
+        Route::get('active-programs/trainer/{trainer_id}', [ActiveProgramController::class, 'showTrainer'])->name('active-programs.trainer');
+
+        // Purchases
+        Route::get('purchases', [PurchaseController::class, 'index'])->name('purchases.index');
+        Route::get('purchases/{booking_id}/invoice', [PurchaseController::class, 'invoice'])->name('purchases.invoice');
 
         Route::get('logout', [OrgAuthController::class, 'logout'])->name('logout');
     });

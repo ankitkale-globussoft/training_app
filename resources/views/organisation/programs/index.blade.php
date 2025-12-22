@@ -26,8 +26,7 @@
                             <select class="form-select" name="program_type">
                                 <option value="">All Types</option>
                                 @foreach ($programTypes as $type)
-                                    <option value="{{ $type->id }}"
-                                        {{ request('program_type') == $type->id ? 'selected' : '' }}>
+                                    <option value="{{ $type->id }}" {{ request('program_type') == $type->id ? 'selected' : '' }}>
                                         {{ $type->name }}
                                     </option>
                                 @endforeach
@@ -75,8 +74,8 @@
                     <div class="col-md-6 col-lg-4">
                         <div class="card h-100">
                             @if ($program->image)
-                                <img class="card-img-top" src="{{ asset('storage/' . $program->image) }}"
-                                    alt="{{ $program->title }}" style="height: 200px; object-fit: cover;">
+                                <img class="card-img-top" src="{{ asset('storage/' . $program->image) }}" alt="{{ $program->title }}"
+                                    style="height: 200px; object-fit: cover;">
                             @else
                                 <div class="card-img-top bg-label-primary d-flex align-items-center justify-content-center"
                                     style="height: 200px;">
@@ -105,9 +104,15 @@
                                     </div>
                                     <div class="d-flex justify-content-between mb-2">
                                         <span class="text-muted">
-                                            <i class="bx bx-dollar"></i> Cost:
+                                            <i class="bx bx-dollar"></i> Price:
                                         </span>
-                                        <span class="fw-semibold">${{ number_format($program->cost, 2) }}</span>
+                                        <span class="fw-semibold">${{ number_format($program->cost, 2) }} / student</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="text-muted">
+                                            <i class="bx bx-group"></i> Min. Students:
+                                        </span>
+                                        <span class="fw-semibold">{{ $program->min_students }}</span>
                                     </div>
                                     @if ($program->trainers->count() > 0)
                                         <div class="d-flex justify-content-between">
@@ -121,16 +126,23 @@
 
                                 <div class="mt-auto">
                                     <button type="button" class="btn btn-outline-primary w-100 mb-2" data-bs-toggle="modal"
-                                        data-bs-target="#programModal"
-                                        onclick='showProgramDetails(@json($program))'>
+                                        data-bs-target="#programModal" onclick='showProgramDetails(@json($program))'>
                                         <i class="bx bx-show"></i> Explore
                                     </button>
                                     @php
-                                        $isRequested = $program->trainingRequirements->isNotEmpty();
+                                        $requirement = $program->trainingRequirements->first();
+                                        $isRequested = (bool) $requirement;
                                     @endphp
                                     @if ($isRequested)
+                                        <div class="alert alert-success p-2 mb-2 small">
+                                            <i class="bx bx-check-circle"></i> Requested for:<br>
+                                            <strong>{{ $requirement->number_of_students }} Students</strong><br>
+                                            <i class="bx bx-calendar"></i>
+                                            {{ \Carbon\Carbon::parse($requirement->schedule_date)->format('d M Y') }} at
+                                            {{ $requirement->schedule_time }}
+                                        </div>
                                         <button type="button" class="btn btn-success w-100 mb-2" disabled>
-                                            <i class="bx bx-check-circle"></i> Requested
+                                            <i class="bx bx-check-circle"></i> Already Requested
                                         </button>
                                     @else
                                         <button type="button" class="btn btn-outline-primary w-100 mb-2"
@@ -197,8 +209,7 @@
                                             </li>
                                         @else
                                             <li class="paginate_button page-item">
-                                                <a href="{{ $programs->url($i) }}"
-                                                    class="page-link">{{ $i }}</a>
+                                                <a href="{{ $programs->url($i) }}" class="page-link">{{ $i }}</a>
                                             </li>
                                         @endif
                                     @endfor
@@ -284,101 +295,114 @@
             let trainersHtml = '';
             if (program.trainers && program.trainers.length > 0) {
                 trainersHtml = `
-            <div class="mb-4">
-                <h6 class="fw-semibold mb-3">
-                    <i class="bx bx-user-circle"></i> Trainers (${program.trainers.length})
-                </h6>
-                <div class="row g-3">
-                    ${program.trainers.map(trainer => `
-                                            <div class="col-md-6">
-                                                <div class="card bg-label-secondary">
-                                                    <div class="card-body">
-                                                        <div class="d-flex align-items-center">
-                                                            ${trainer.profile_pic ? `
-                                            <img src="{{ asset('storage') }}/${trainer.profile_pic}" 
-                                                 alt="${trainer.name}" 
-                                                 class="rounded-circle me-2" 
-                                                 style="width: 40px; height: 40px; object-fit: cover;">
-                                        ` : `
-                                            <div class="avatar avatar-sm me-2">
-                                                <span class="avatar-initial rounded-circle bg-label-primary">
-                                                    ${trainer.name ? trainer.name.charAt(0).toUpperCase() : 'T'}
-                                                </span>
-                                            </div>
-                                        `}
-                                                            <div>
-                                                                <h6 class="mb-0">${trainer.name || 'N/A'}</h6>
-                                                                ${trainer.email ? `<small class="text-muted">${trainer.email}</small>` : ''}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        `).join('')}
-                </div>
-            </div>
-        `;
+                                <div class="mb-4">
+                                    <h6 class="fw-semibold mb-3">
+                                        <i class="bx bx-user-circle"></i> Trainers (${program.trainers.length})
+                                    </h6>
+                                    <div class="row g-3">
+                                        ${program.trainers.map(trainer => `
+                                                                <div class="col-md-6">
+                                                                    <div class="card bg-label-secondary">
+                                                                        <div class="card-body">
+                                                                            <div class="d-flex align-items-center">
+                                                                                ${trainer.profile_pic ? `
+                                                                <img src="{{ asset('storage') }}/${trainer.profile_pic}" 
+                                                                     alt="${trainer.name}" 
+                                                                     class="rounded-circle me-2" 
+                                                                     style="width: 40px; height: 40px; object-fit: cover;">
+                                                            ` : `
+                                                                <div class="avatar avatar-sm me-2">
+                                                                    <span class="avatar-initial rounded-circle bg-label-primary">
+                                                                        ${trainer.name ? trainer.name.charAt(0).toUpperCase() : 'T'}
+                                                                    </span>
+                                                                </div>
+                                                            `}
+                                                                                <div>
+                                                                                    <h6 class="mb-0">${trainer.name || 'N/A'}</h6>
+                                                                                    ${trainer.email ? `<small class="text-muted">${trainer.email}</small>` : ''}
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            `).join('')}
+                                    </div>
+                                </div>
+                            `;
             }
 
             modalBody.innerHTML = `
-        ${program.image ? `
-                                <img src="{{ asset('storage') }}/${program.image}" class="img-fluid rounded mb-4" 
-                                     alt="${program.title}" style="max-height: 300px; width: 100%; object-fit: cover;">
-                            ` : ''}
-        
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="flex-shrink-0">
-                        <span class="badge badge-center rounded-pill bg-label-primary w-px-50 h-px-50">
-                            <i class="bx bx-time-five bx-sm"></i>
-                        </span>
-                    </div>
-                    <div class="flex-grow-1 ms-3">
-                        <h6 class="mb-0">Duration</h6>
-                        <small class="text-muted">${program.duration} months</small>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="flex-shrink-0">
-                        <span class="badge badge-center rounded-pill bg-label-success w-px-50 h-px-50">
-                            <i class="bx bx-dollar bx-sm"></i>
-                        </span>
-                    </div>
-                    <div class="flex-grow-1 ms-3">
-                        <h6 class="mb-0">Cost</h6>
-                        <small class="text-muted">$${parseFloat(program.cost).toFixed(2)}</small>
-                    </div>
-                </div>
-            </div>
-            ${program.program_type ? `
-                                    <div class="col-md-6">
-                                        <div class="d-flex align-items-center mb-3">
-                                            <div class="flex-shrink-0">
-                                                <span class="badge badge-center rounded-pill bg-label-info w-px-50 h-px-50">
-                                                    <i class="bx bx-category bx-sm"></i>
-                                                </span>
-                                            </div>
-                                            <div class="flex-grow-1 ms-3">
-                                                <h6 class="mb-0">Type</h6>
-                                                <small class="text-muted">${program.program_type.name}</small>
-                                            </div>
+                            ${program.image ? `
+                                                    <img src="{{ asset('storage') }}/${program.image}" class="img-fluid rounded mb-4"
+                                                         alt="${program.title}" style="max-height: 300px; width: 100%; object-fit: cover;">
+                                                ` : ''}
+
+                            <div class="row mb-4">
+                                <div class="col-md-4">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="flex-shrink-0">
+                                            <span class="badge badge-center rounded-pill bg-label-primary w-px-50 h-px-50">
+                                                <i class="bx bx-time-five bx-sm"></i>
+                                            </span>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h6 class="mb-0">Duration</h6>
+                                            <small class="text-muted">${program.duration} months</small>
                                         </div>
                                     </div>
-                                ` : ''}
-        </div>
+                                </div>
+                                <div class="col-md-4">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="flex-shrink-0">
+                                        <span class="badge badge-center rounded-pill bg-label-success w-px-50 h-px-50">
+                                            <i class="bx bx-dollar bx-sm"></i>
+                                        </span>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h6 class="mb-0">Price</h6>
+                                        <small class="text-muted">$${parseFloat(program.cost).toFixed(2)} / student</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="flex-shrink-0">
+                                        <span class="badge badge-center rounded-pill bg-label-warning w-px-50 h-px-50">
+                                            <i class="bx bx-group bx-sm"></i>
+                                        </span>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h6 class="mb-0">Min. Students</h6>
+                                        <small class="text-muted">${program.min_students}</small>
+                                    </div>
+                                </div>
+                            </div>
+                                ${program.program_type ? `
+                                                        <div class="col-md-6">
+                                                            <div class="d-flex align-items-center mb-3">
+                                                                <div class="flex-shrink-0">
+                                                                    <span class="badge badge-center rounded-pill bg-label-info w-px-50 h-px-50">
+                                                                        <i class="bx bx-category bx-sm"></i>
+                                                                    </span>
+                                                                </div>
+                                                                <div class="flex-grow-1 ms-3">
+                                                                    <h6 class="mb-0">Type</h6>
+                                                                    <small class="text-muted">${program.program_type.name}</small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ` : ''}
+                            </div>
 
-        <div class="mb-4">
-            <h6 class="fw-semibold mb-2">
-                <i class="bx bx-detail"></i> Description
-            </h6>
-            <p class="text-muted">${program.description || 'No description available.'}</p>
-        </div>
+                            <div class="mb-4">
+                                <h6 class="fw-semibold mb-2">
+                                    <i class="bx bx-detail"></i> Description
+                                </h6>
+                                <p class="text-muted">${program.description || 'No description available.'}</p>
+                            </div>
 
-        ${trainersHtml}
-    `;
+                            ${trainersHtml}
+                        `;
         }
     </script>
 
@@ -387,31 +411,70 @@
             Swal.fire({
                 title: 'Request Program',
                 html: `
-            <div class="text-start">
-                <label class="form-label">Select Training Mode</label>
-                <select id="training_mode" class="form-select">
-                    <option value="">-- Select Mode --</option>
-                    <option value="online">Online</option>
-                    <option value="offline">Offline</option>
-                </select>
-                <div id="mode_error" class="text-danger mt-1" style="display:none;">
-                    Please select a training mode
-                </div>
-            </div>
-        `,
+                        <div class="text-start">
+                            <div class="mb-3">
+                                <label class="form-label">Select Training Mode</label>
+                                <select id="training_mode" class="form-select">
+                                    <option value="">-- Select Mode --</option>
+                                    <option value="online">Online</option>
+                                    <option value="offline">Offline</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Number of Students (Min: ${program.min_students})</label>
+                                <input type="number" id="num_students" class="form-control" value="${program.min_students}" min="${program.min_students}" oninput="updatePrice(${program.cost})">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Schedule Date</label>
+                                <input type="date" id="schedule_date" class="form-control" min="${new Date().toISOString().split('T')[0]}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Schedule Time</label>
+                                <input type="time" id="schedule_time" class="form-control">
+                            </div>
+                            <div class="p-3 bg-label-primary rounded">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-semibold">Total Price:</span>
+                                    <h4 class="mb-0 text-primary" id="calculated_price">$${(program.cost * program.min_students).toFixed(2)}</h4>
+                                </div>
+                            </div>
+                            <div id="swal_error" class="text-danger mt-2 small" style="display:none;"></div>
+                        </div>
+                    `,
                 showCancelButton: true,
-                confirmButtonText: 'Request',
+                confirmButtonText: 'Submit Request',
+                didOpen: () => {
+                    // Global function to update price inside Swal
+                    window.updatePrice = (cost) => {
+                        const students = document.getElementById('num_students').value || 0;
+                        document.getElementById('calculated_price').innerText = '$' + (cost * students).toFixed(2);
+                    };
+                },
                 preConfirm: () => {
                     const mode = document.getElementById('training_mode').value;
+                    const students = document.getElementById('num_students').value;
+                    const date = document.getElementById('schedule_date').value;
+                    const time = document.getElementById('schedule_time').value;
+                    const errorDiv = document.getElementById('swal_error');
 
-                    if (!mode) {
-                        document.getElementById('mode_error').style.display = 'block';
+                    if (!mode || !students || !date || !time) {
+                        errorDiv.innerText = 'Please fill all fields';
+                        errorDiv.style.display = 'block';
+                        return false;
+                    }
+
+                    if (parseInt(students) < program.min_students) {
+                        errorDiv.innerText = 'Minimum ' + program.min_students + ' students required';
+                        errorDiv.style.display = 'block';
                         return false;
                     }
 
                     return {
                         mode: mode,
-                        program_id: program.program_id
+                        program_id: program.program_id,
+                        number_of_students: students,
+                        schedule_date: date,
+                        schedule_time: time
                     };
                 }
             }).then((result) => {
@@ -423,15 +486,15 @@
 
         function submitProgramRequest(data) {
             fetch("{{ route('org.programs.request') }}", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": document
-                            .querySelector('meta[name="csrf-token"]')
-                            .getAttribute("content")
-                    },
-                    body: JSON.stringify(data)
-                })
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": document
+                        .querySelector('meta[name="csrf-token"]')
+                        .getAttribute("content")
+                },
+                body: JSON.stringify(data)
+            })
                 .then(response => response.json())
                 .then(res => {
                     if (res.status) {

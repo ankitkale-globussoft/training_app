@@ -37,7 +37,7 @@ class ProgramController extends Controller
      */
     public function create()
     {
-        $program_types  = ProgramType::all();
+        $program_types = ProgramType::all();
         return view('admin.program.add', compact('program_types'));
     }
 
@@ -47,18 +47,19 @@ class ProgramController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'title'           => 'required|string|max:255|unique:programs,title',
-            'duration'        => 'required|string|max:255',
+            'title' => 'required|string|max:255|unique:programs,title',
+            'duration' => 'required|string|max:255',
             'program_type_id' => 'required|exists:program_types,id',
-            'cost'            => 'required|numeric|min:0',
-            'description'     => 'required|string|max:255',
-            'image'           => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
+            'cost' => 'required|numeric|min:0',
+            'min_students' => 'required|integer|min:1',
+            'description' => 'required|string|max:255',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
         ]);
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors'  => $validator->errors(),
-                'msg'     => 'Validation failed'
+                'errors' => $validator->errors(),
+                'msg' => 'Validation failed'
             ], 422);
         }
         $validated = $validator->validated();
@@ -68,8 +69,8 @@ class ProgramController extends Controller
         $program = Program::create($validated);
         return response()->json([
             'success' => true,
-            'result'  => ['program' => $program],
-            'msg'     => 'Program created successfully'
+            'result' => ['program' => $program],
+            'msg' => 'Program created successfully'
         ], 201);
     }
 
@@ -87,7 +88,7 @@ class ProgramController extends Controller
     public function edit(string $id)
     {
         $program = Program::findOrFail($id);
-        $program_types  = ProgramType::all();
+        $program_types = ProgramType::all();
         return view('admin.program.edit', compact('program', 'program_types'));
     }
 
@@ -104,17 +105,18 @@ class ProgramController extends Controller
                 'max:255',
                 Rule::unique('programs', 'title')->ignore($program->program_id, 'program_id')
             ],
-            'duration'        => 'required|string|max:255',
+            'duration' => 'required|string|max:255',
             'program_type_id' => 'required|exists:program_types,id',
-            'cost'            => 'required|string|max:255',
-            'description'     => 'required|string|max:255',
-            'image'           => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
+            'cost' => 'required|numeric|min:0',
+            'min_students' => 'required|integer|min:1',
+            'description' => 'required|string|max:255',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
         ]);
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors'  => $validator->errors(),
-                'msg'     => 'Validation failed'
+                'errors' => $validator->errors(),
+                'msg' => 'Validation failed'
             ], 422);
         }
         $validated = $validator->validated();
@@ -125,7 +127,7 @@ class ProgramController extends Controller
             }
             // Save new image
             $validated['image'] = $request->file('image')->store('programs_images', 'public');
-        } 
+        }
         // else {
         //     Storage::disk('public')->delete($program->image);
         //     $program->image = null;
@@ -134,8 +136,8 @@ class ProgramController extends Controller
         $program->update($validated);
         return response()->json([
             'success' => true,
-            'result'  => ['program' => $program],
-            'msg'     => 'Program updated successfully'
+            'result' => ['program' => $program],
+            'msg' => 'Program updated successfully'
         ], 201);
     }
 
