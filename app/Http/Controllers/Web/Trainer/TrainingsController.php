@@ -153,4 +153,59 @@ class TrainingsController extends Controller
 
         return $query->latest()->paginate(10);
     }
+
+    public function assigned_trainings(Request $request)
+    {
+        $trainerId = Auth::guard('trainer_web')->user()->trainer_id;
+
+        $bookings = \App\Models\Booking::with([
+            'requirement.program',
+            'organization',
+            'progress' => function ($q) {
+                $q->latest()->limit(1);
+            }
+        ])
+            ->where('trainer_id', $trainerId)
+            ->where('booking_status', 'assigned')
+            ->latest()
+            ->paginate(9);
+
+        return view('trainer.trainings.assigned', compact('bookings'));
+    }
+
+    public function updateStatus(Request $request)
+    {
+        $request->validate([
+            'booking_id' => 'required|exists:bookings,booking_id',
+            'status' => 'required|string',
+            'percentage' => 'required|numeric|min:0|max:100',
+            'note' => 'nullable|string'
+        ]);
+
+        $booking = \App\Models\Booking::with('requirement')->findOrFail($request->booking_id);
+
+        // Validation based on mode
+        if ($booking->requirement->mode == 'online') {
+            if (in_array($request->status, ['enroute', 'arrived', 'teaching_started'])) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Invalid status for online training.'
+                ], 422);
+            }
+        }
+
+        \App\Models\BookingProgress::updateOrCreate(
+            ['booking_id' => $request->booking_id],
+            [
+                'status' => $request->status,
+                'percentage' => $request->percentage,
+                'note' => $request->note
+            ]
+        );
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Status updated successfully!'
+        ]);
+    }
 }

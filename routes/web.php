@@ -15,6 +15,7 @@ use App\Http\Controllers\Web\Org\PurchaseController;
 use App\Http\Controllers\Web\Trainer\AuthController as TrainerAuthController;
 use App\Http\Controllers\Web\Trainer\ContentManagerController;
 use App\Http\Controllers\Web\Trainer\DashboardController;
+use App\Http\Controllers\Web\Trainer\PaymentController as TrainerPaymentController;
 use App\Http\Controllers\Web\Trainer\TrainerController;
 use App\Http\Controllers\Web\Trainer\TrainerProgramsController;
 use App\Http\Controllers\Web\Trainer\TrainingsController;
@@ -75,6 +76,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('payments', [PaymentController::class, 'view'])->name('payments');
         Route::get('/payments/data', [PaymentController::class, 'getPaymentsData'])->name('payments.data');
         Route::get('/payments/{id}', [PaymentController::class, 'showPaymentDetails'])->name('payments.details');
+        // trainer payments
+        Route::get('trainer-payments', [PaymentController::class, 'viewTrainerPayments'])->name('payments.trainer-payments');
+        Route::get('trainer-bank-details/{id}', [PaymentController::class, 'getTrainerBankDetails'])->name('payments.bank-details');
+        Route::post('update-status', [PaymentController::class, 'updatePaymentStatus'])->name('payments.update-status');
 
         Route::get('logout', [AdminAuthController::class, 'logout'])->name('logout');
     });
@@ -112,6 +117,8 @@ Route::prefix('trainer')->name('trainer.')->group(function () {
         Route::post('/trainings/accept', [TrainingsController::class, 'acceptTraining'])->name('trainings.accept');
         Route::get('upcomming-trainings', [TrainingsController::class, 'upcomming'])->name('trainings.upcomming');
         Route::get('upcomming-trainings/list', [TrainingsController::class, 'list'])->name('trainings.upcomming.list');
+        Route::get('assigned-trainings', [TrainingsController::class, 'assigned_trainings'])->name('trainings.assigned');
+        Route::post('/trainings/update-status', [TrainingsController::class, 'updateStatus'])->name('trainings.update_status');
 
         // Content Manager 
         Route::get('content-manager', [ContentManagerController::class, 'index'])->name('content-manager');
@@ -124,6 +131,12 @@ Route::prefix('trainer')->name('trainer.')->group(function () {
 
         Route::delete('/content-manager/{id}', [ContentManagerController::class, 'destroy'])->name('content.destroy');
 
+        // Payments
+        Route::get('account-details', [TrainerPaymentController::class, 'viewAccountDetails'])->name('payments.account-details');
+        Route::post('account-details', [TrainerPaymentController::class, 'storeAccountDetails'])->name('payments.account-details.store');
+        Route::get('payments', [TrainerPaymentController::class, 'view'])->name('payments.view');
+        Route::get('payment/request', [TrainerPaymentController::class, 'requestPayment'])->name('payments.request');
+        Route::post('payment/request', [TrainerPaymentController::class, 'storeRequest'])->name('payments.request.store');
 
         Route::get('logout', [TrainerAuthController::class, 'logout'])->name('logout');
     });

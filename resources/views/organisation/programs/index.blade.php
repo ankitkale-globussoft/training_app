@@ -106,7 +106,7 @@
                                         <span class="text-muted">
                                             <i class="bx bx-dollar"></i> Price:
                                         </span>
-                                        <span class="fw-semibold">${{ number_format($program->cost, 2) }} / student</span>
+                                        <span class="fw-semibold">₹{{ number_format($program->cost, 2) }} / student</span>
                                     </div>
                                     <div class="d-flex justify-content-between mb-2">
                                         <span class="text-muted">

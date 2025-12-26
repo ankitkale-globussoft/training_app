@@ -50,9 +50,9 @@ Route::post('trainer/signup', [TAuthController::class, 'signup']);
 
 // Trainer protected routes (requires auth + trainer role)
 Route::middleware(['auth:sanctum', 'trainer.api'])->group(function () {
-    Route::get('dashboard', [TrainerDashboardController::class, 'index']);
+    // Route::get('dashboard', [TrainerDashboardController::class, 'index']);
 
-    Route::put('trainer/{id}', [TAuthController::class, 'update']);
+    Route::patch('trainer/{id}', [TAuthController::class, 'update']);
     Route::get('trainer/{id}', [TAuthController::class, 'show']);
     Route::delete('trainer/{id}', [TAuthController::class, 'destroy']);
     Route::get('trainers', [TAuthController::class, 'index']);
@@ -87,9 +87,9 @@ Route::prefix('org/')->group(function () {
         Route::post('profile/update', [OrgAuthController::class, 'update']);
 
         // Programs
-        Route::get('programs', [OrgProgramsController::class, 'index']);
-        Route::get('programs/{id}', [OrgProgramsController::class, 'show']);
-        Route::post('programs/request', [OrgProgramsController::class, 'requestProgram']);
+        Route::get('programs', [OrgProgramsController::class, 'index']); // get the programs
+        Route::get('programs/{id}', [OrgProgramsController::class, 'show']); // get program detail
+        Route::post('programs/request', [OrgProgramsController::class, 'requestProgram']); 
         Route::get('requested-programs', [OrgProgramsController::class, 'show_requestedPrograms']);
         Route::delete('programs/request/{id}', [OrgProgramsController::class, 'cancelRequest']);
 

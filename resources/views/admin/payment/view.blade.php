@@ -4,7 +4,7 @@
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
         <h4 class="fw-bold mb-4">
-            <span class="text-muted fw-light">Payments /</span> All Payments
+            <span class="text-muted fw-light">Payments /</span> Organisation Payments
         </h4>
 
         <!-- Filters Card -->

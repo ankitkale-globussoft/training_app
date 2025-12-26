@@ -149,14 +149,14 @@
                         {{ \Carbon\Carbon::parse($booking->requirement->schedule_end)->format('d M Y') }}</small>
                 </td>
                 <td class="text-end">
-                    ${{ number_format($booking->amount, 2) }}
+                    ₹{{ number_format($booking->amount, 2) }}
                 </td>
             </tr>
 
             <tr class="total">
                 <td></td>
                 <td class="text-end">
-                    Total: ${{ number_format($booking->amount, 2) }}
+                    Total: ₹{{ number_format($booking->amount, 2) }}
                 </td>
             </tr>
         </table>

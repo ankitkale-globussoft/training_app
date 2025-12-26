@@ -51,9 +51,19 @@
         </li>
 
         {{-- Payment --}}
-        <li class="menu-item {{ request()->routeIs('admin.payments') ? 'active' : '' }}">
-            <a href="{{ route('admin.payments') }}" class="menu-link"><i class="menu-icon tf-icons bx bx-home-circle"></i>
+        <li class="menu-item {{ request()->routeIs('admin.payments*') ? 'active open' : '' }}">
+            <a href="#" class="menu-link menu-toggle"><i class="menu-icon tf-icons bx bx-box"></i>
             <div data-i18n="Payments">Payments</div></a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ request()->routeIs('admin.payments') ? 'active' : '' }}">
+                    <a href="{{ route('admin.payments') }}" class="menu-link"><i class="menu-icon tf-icons bx bx-home-circle"></i>
+                    <div data-i18n="Organisation Payments">Organisation Payments</div></a>
+                </li>
+                <li class="menu-item {{ request()->routeIs('admin.payments.trainer-payments') ? 'active' : '' }}">
+                    <a href="{{ route('admin.payments.trainer-payments') }}" class="menu-link"><i class="menu-icon tf-icons bx bx-home-circle"></i>
+                    <div data-i18n="Trainer Payments">Trainer Payments</div></a>
+                </li>
+            </ul>
         </li>
 
         {{-- Trainers --}}

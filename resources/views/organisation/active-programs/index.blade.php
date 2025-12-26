@@ -49,15 +49,18 @@
             </div>
             <div class="modal-body">
                 <div class="d-flex align-items-center mb-4">
-                    <img src="" id="trainerProfilePic" alt="Trainer" class="rounded-circle me-3" width="80" height="80" style="object-fit:cover; display:none;">
-                    <div id="trainerInitials" class="rounded-circle bg-label-primary d-flex align-items-center justify-content-center me-3" style="width: 80px; height: 80px; font-size: 2rem; display:none;"></div>
-                    
+                    <img src="" id="trainerProfilePic" alt="Trainer" class="rounded-circle me-3" width="80" height="80"
+                        style="object-fit:cover; display:none;">
+                    <div id="trainerInitials"
+                        class="rounded-circle bg-label-primary d-flex align-items-center justify-content-center me-3"
+                        style="width: 80px; height: 80px; font-size: 2rem; display:none;"></div>
+
                     <div>
                         <h4 class="mb-1" id="trainerName"></h4>
                         <p class="mb-0 text-muted"><i class="bx bx-map me-1"></i> <span id="trainerLocation"></span></p>
                     </div>
                 </div>
-                
+
                 <div class="row">
                     <div class="col-12 mb-3">
                         <small class="fw-semibold d-block text-uppercase mb-1">Contact Info</small>
@@ -140,11 +143,11 @@
             $('#trainerDetailsModal').modal('show');
 
             // Fetch details
-             $.ajax({
+            $.ajax({
                 url: "{{ url('org/active-programs/trainer') }}/" + trainerId,
                 type: "GET",
-                success: function(response) {
-                    if(response.status) {
+                success: function (response) {
+                    if (response.status) {
                         const data = response.data;
                         $('#trainerName').text(data.name);
                         $('#trainerLocation').text((data.city || '') + (data.state ? ', ' + data.state : ''));
@@ -153,17 +156,33 @@
                         $('#trainerBio').text(data.biodata || 'No biography available.');
                         $('#trainerAchievements').text(data.achievements || '');
 
-                        if(data.profile_pic) {
+                        if (data.profile_pic) {
                             $('#trainerProfilePic').attr('src', data.profile_pic).show();
                         } else {
-                             $('#trainerInitials').text(data.name.charAt(0)).show();
+                            $('#trainerInitials').text(data.name.charAt(0)).show();
                         }
                     }
                 },
-                error: function() {
+                error: function () {
                     $('#trainerName').text('Error fetching details');
                 }
             });
+        }
+
+        function toggleNote(element) {
+            let container = $(element).closest('.bg-label-secondary');
+            let shortText = container.find('.note-short');
+            let fullText = container.find('.note-full');
+
+            if (shortText.is(':visible')) {
+                shortText.addClass('d-none');
+                fullText.removeClass('d-none');
+                $(element).text('Read Less');
+            } else {
+                shortText.removeClass('d-none');
+                fullText.addClass('d-none');
+                $(element).text('Read More');
+            }
         }
     </script>
 @endpush

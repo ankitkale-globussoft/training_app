@@ -91,7 +91,7 @@
                                         </div>
                                     </div>
                                     <span class="fw-semibold d-block mb-1">Total Earnings</span>
-                                    <h3 class="card-title mb-2">${{ number_format($totalEarnings, 2) }}</h3>
+                                    <h3 class="card-title mb-2">₹{{ number_format($totalEarnings, 2) }}</h3>
                                     <small class="text-success fw-semibold"><i class='bx bx-up-arrow-alt'></i> +12%</small>
                                 </div>
                             </div>
@@ -166,7 +166,7 @@
                                             <td>{{ $booking->created_at->format('d M Y') }}</td>
                                             <td><span class="fw-semibold">{{ $booking->requirement->program->title }}</span></td>
                                             <td>{{ $booking->organization->name }}</td>
-                                            <td>${{ number_format($booking->amount, 2) }}</td>
+                                            <td>₹{{ number_format($booking->amount, 2) }}</td>
                                             <td>
                                                 @php
                                                     $statusClass = match ($booking->payment_status) {
@@ -176,7 +176,7 @@
                                                         default => 'bg-label-secondary'
                                                     };
                                                 @endphp
-                                                <span class="badge {{ $statusClass }} me-1">{{ $booking->payment_status }}</span>
+                                                <span class="badge {{ $statusClass }} me-1">{{ $booking->payment_status === 'completed' ? 'paid' : $booking->payment_status }}</span>
                                             </td>
                                         </tr>
                                     @empty

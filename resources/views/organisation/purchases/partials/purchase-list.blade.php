@@ -23,7 +23,7 @@
                     <td><span class="fw-semibold">#{{ $purchase->transaction_id ?? 'N/A' }}</span></td>
                     <td>{{ $purchase->requirement->program->title }}</td>
                     <td>{{ $purchase->booking && $purchase->booking->trainer ? $purchase->booking->trainer->name : 'N/A' }}</td>
-                    <td>${{ number_format($purchase->amount, 2) }}</td>
+                    <td>₹{{ number_format($purchase->amount, 2) }}</td>
                     <td>
                         @php
                             $statusClass = match ($purchase->payment_status) {

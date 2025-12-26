@@ -17,7 +17,7 @@ class ActiveProgramController extends Controller
         if ($request->ajax()) {
             $orgId = Auth::guard('org_web')->user()->org_id;
 
-            $query = TrainingRequirement::with(['program.programType', 'booking.trainer'])
+            $query = TrainingRequirement::with(['program.programType', 'booking.trainer', 'booking.progress'])
                 ->where('org_id', $orgId)
                 ->where('status', 'assigned'); // Only active/assigned programs
 

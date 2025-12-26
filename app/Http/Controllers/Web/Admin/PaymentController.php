@@ -140,4 +140,52 @@ class PaymentController extends Controller
             ], 500);
         }
     }
+
+    public function viewTrainerPayments()
+    {
+        $pendingRequests = \App\Models\PaymentRequest::with('trainer')
+            ->where('status', 'pending')
+            ->latest()
+            ->paginate(10, ['*'], 'pending_page');
+
+        $history = \App\Models\PaymentRequest::with('trainer')
+            ->whereIn('status', ['approved', 'rejected'])
+            ->latest()
+            ->paginate(10, ['*'], 'history_page');
+
+        return view('admin.payment.trainer_payments', compact('pendingRequests', 'history'));
+    }
+
+    public function getTrainerBankDetails($id)
+    {
+        $details = \App\Models\TrainerBankDetail::where('trainer_id', $id)->first();
+        if (!$details) {
+            return response()->json(['status' => false, 'message' => 'Bank details not found']);
+        }
+        return response()->json(['status' => true, 'data' => $details]);
+    }
+
+    public function updatePaymentStatus(Request $request)
+    {
+        $request->validate([
+            'request_id' => 'required|exists:payment_requests,request_id',
+            'status' => 'required|in:approved,rejected',
+            'admin_note' => 'nullable|string',
+            'payment_proof' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048'
+        ]);
+
+        $paymentRequest = \App\Models\PaymentRequest::findOrFail($request->request_id);
+
+        $paymentRequest->status = $request->status;
+        $paymentRequest->admin_note = $request->admin_note;
+
+        if ($request->hasFile('payment_proof')) {
+            $path = $request->file('payment_proof')->store('payment_proofs', 'public');
+            $paymentRequest->payment_proof = $path;
+        }
+
+        $paymentRequest->save();
+
+        return back()->with('success', 'Payment status updated successfully.');
+    }
 }

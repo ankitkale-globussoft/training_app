@@ -50,6 +50,37 @@
                             </div>
                         </div>
 
+                        @if($req->booking && $req->booking->progress->isNotEmpty())
+                            @php
+                                $progress = $req->booking->progress->first();
+                            @endphp
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="fw-semibold">Status: <span
+                                            class="text-primary text-capitalize">{{ str_replace('_', ' ', $progress->status) }}</span></span>
+                                    <span class="fw-semibold">{{ $progress->percentage }}%</span>
+                                </div>
+                                <div class="progress mb-2" style="height: 6px;">
+                                    <div class="progress-bar bg-primary" role="progressbar"
+                                        style="width: {{ $progress->percentage }}%" aria-valuenow="{{ $progress->percentage }}"
+                                        aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                @if($progress->note)
+                                    <div class="bg-label-secondary p-2 rounded small">
+                                        <strong>Note:</strong>
+                                        @if(strlen($progress->note) > 60)
+                                            <span class="note-short">{{ Str::limit($progress->note, 60) }}</span>
+                                            <span class="note-full d-none">{{ $progress->note }}</span>
+                                            <a href="javascript:void(0)" onclick="toggleNote(this)" class="text-primary fw-bold"
+                                                style="font-size: 0.8rem;">Read More</a>
+                                        @else
+                                            {{ $progress->note }}
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
+
                         <div class="d-grid gap-2">
                             @if($req->booking && $req->booking->trainer)
                                 <button type="button" class="btn btn-outline-primary"

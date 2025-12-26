@@ -21,7 +21,7 @@ class IsOrgApi
         if(!$org){
             return response()->json([
                 'success' => false,
-                'msg' => 'Unauthorized. Trainer access only.'
+                'msg' => 'Unauthorized. Plese login to proceed.'
             ], 403);
         }
 

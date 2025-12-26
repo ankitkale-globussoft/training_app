@@ -57,9 +57,9 @@
                             <div data-i18n="Upcomming">Upcomming</div>
                         </a>
                     </li>
-                    <li class="menu-item">
-                        <a href="#" class="menu-link"><i class="menu-icon tf-icons bx bx-home-circle"></i>
-                            <div data-i18n="Ongoing">Ongoing</div>
+                    <li class="menu-item {{ request()->routeIs('trainer.trainings.assigned') ? 'active' : '' }}">
+                        <a href="{{ route('trainer.trainings.assigned') }}" class="menu-link"><i class="menu-icon tf-icons bx bx-home-circle"></i>
+                            <div data-i18n="Ongoing">Assigned</div>
                         </a>
                     </li>
                 </ul>
@@ -71,6 +71,33 @@
                         class="menu-icon tf-icons bx bx-home-circle"></i>
                     <div data-i18n="Content Manager">Content Manager</div>
                 </a>
+            </li>
+
+            {{-- Payments --}}
+            <li class="menu-item {{ request()->routeIs('trainer.payments.*') ? 'active open' : '' }}">
+                <a href="#" class="menu-link menu-toggle"><i class="menu-icon tf-icons bx bx-box"></i>
+                    <div data-i18n="Trainings">Payments</div>
+                </a>
+                <ul class="menu-sub">
+                    <li class="menu-item {{ request()->routeIs('trainer.payments.view') ? 'active' : '' }}">
+                        <a href="{{ route('trainer.payments.view') }}" class="menu-link"><i
+                                class="menu-icon tf-icons bx bx-home-circle"></i>
+                            <div data-i18n="Payments">Payments</div>
+                        </a>
+                    </li>
+                    <li class="menu-item {{ request()->routeIs('trainer.payments.request') ? 'active' : '' }}">
+                        <a href="{{ route('trainer.payments.request') }}" class="menu-link"><i
+                                class="menu-icon tf-icons bx bx-home-circle"></i>
+                            <div data-i18n="Request Payment">Request Payment</div>
+                        </a>
+                    </li> 
+                    <li class="menu-item {{ request()->routeIs('trainer.payments.account-details') ? 'active' : '' }}">
+                        <a href="{{ route('trainer.payments.account-details') }}" class="menu-link"><i
+                                class="menu-icon tf-icons bx bx-home-circle"></i>
+                            <div data-i18n="Account Details">Account Details</div>
+                        </a>
+                    </li>
+                </ul>
             </li>
         @endif
     </ul>

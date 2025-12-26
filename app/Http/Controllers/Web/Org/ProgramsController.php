@@ -264,6 +264,14 @@ class ProgramsController extends Controller
                 'payment' => 'completed'
             ]);
 
+            // Create initial booking progress
+            \App\Models\BookingProgress::create([
+                'booking_id' => $booking->booking_id,
+                'status' => 'assigned',
+                'percentage' => 0,
+                'note' => 'Payment Completed'
+            ]);
+
             DB::commit();
 
             return response()->json([

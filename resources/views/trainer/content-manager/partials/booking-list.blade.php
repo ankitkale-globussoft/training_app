@@ -11,8 +11,7 @@
                         <i class="bx bx-dots-vertical-rounded"></i>
                     </button>
                     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="orederStatistics">
-                        <a class="dropdown-item" href="{{ route('trainer.content.manage', $booking->booking_id) }}">Manage
-                            Content</a>
+                        <a class="dropdown-item" href="{{ route('trainer.content.manage', $booking->booking_id) }}">Manage Content</a>
                     </div>
                 </div>
             </div>
@@ -27,7 +26,7 @@
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <span class="badge bg-label-info">{{ strtoupper($booking->requirement->mode ?? 'N/A') }}</span>
                     <small class="text-muted"><i class="bx bx-file"></i> {{ $booking->content_count ?? 0 }}
-                        ContentItems</small>
+                        Content Items</small>
                 </div>
 
                 <!-- Schedule -->

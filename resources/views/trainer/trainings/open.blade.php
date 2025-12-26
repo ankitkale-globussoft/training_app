@@ -116,7 +116,7 @@
                                     <li class="mb-1">
                                         <i class="bx bx-dollar"></i>
                                         <strong>Total Price:</strong>
-                                        ${{ number_format($req->number_of_students * $req->program->cost, 2) }}
+                                        ₹{{ number_format($req->number_of_students * $req->program->cost, 2) }}
                                     </li>
                                     @if ($req->schedule_date)
                                         <li class="mb-1 text-nowrap">

@@ -57,7 +57,7 @@
                             <div class="badge bg-label-danger">+10%</div>
                         </div>
                         <span class="d-block mb-1 text-muted">Total Revenue</span>
-                        <h4 class="card-title mb-1">${{ number_format($totalRevenue, 2) }}</h4>
+                        <h4 class="card-title mb-1">₹{{ number_format($totalRevenue, 2) }}</h4>
                     </div>
                 </div>
             </div>
@@ -146,7 +146,7 @@
                                         <td>{{ $booking->created_at->format('d M, Y') }}</td>
                                         <td>{{ $booking->organization->name }}</td>
                                         <td>{{ \Illuminate\Support\Str::limit($booking->requirement->program->title, 20) }}</td>
-                                        <td>${{ number_format($booking->amount, 2) }}</td>
+                                        <td>₹{{ number_format($booking->amount, 2) }}</td>
                                         <td>
                                             @php
                                                 $statusClass = match ($booking->payment_status) {
