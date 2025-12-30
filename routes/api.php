@@ -89,7 +89,7 @@ Route::prefix('org/')->group(function () {
         // Programs
         Route::get('programs', [OrgProgramsController::class, 'index']); // get the programs
         Route::get('programs/{id}', [OrgProgramsController::class, 'show']); // get program detail
-        Route::post('programs/request', [OrgProgramsController::class, 'requestProgram']); 
+        Route::post('programs/request', [OrgProgramsController::class, 'requestProgram']);
         Route::get('requested-programs', [OrgProgramsController::class, 'show_requestedPrograms']);
         Route::delete('programs/request/{id}', [OrgProgramsController::class, 'cancelRequest']);
 

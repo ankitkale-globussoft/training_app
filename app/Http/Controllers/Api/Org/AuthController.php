@@ -110,7 +110,7 @@ class AuthController extends Controller
 
     public function update(Request $request)
     {
-        $org = Organization::findOrFail(Auth::guard('org_web')->user()->org_id);
+        $org = Organization::findOrFail(Auth::guard('org_api')->user()->org_id);
         $validator = Validator::make($request->all(), [
             'name'            => 'required|string|max:255',
             'rep_designation' => 'required|string|max:255',

@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Razorpay\Api\Api;
+use Illuminate\Support\Facades\Validator;
 use Exception;
 
 class ProgramsController extends Controller
@@ -96,13 +97,21 @@ class ProgramsController extends Controller
     public function requestProgram(Request $request)
     {
         try {
-            $request->validate([
-                'program_id' => 'required|integer',
+            $validator = Validator::make($request->all(), [
+                'program_id' => 'required|integer|exists:programs,program_id',
                 'mode' => 'required|in:online,offline',
                 'number_of_students' => 'required|integer|min:1',
                 'schedule_date' => 'required|date',
                 'schedule_time' => 'required|string',
             ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors'  => $validator->errors(),
+                ], 422);
+            }
 
             $orgId = Auth::user()->org_id;
 
@@ -115,7 +124,6 @@ class ProgramsController extends Controller
                     'success' => false,
                     'message' => 'You have already requested this program',
                     'data' => null,
-                    'status' => 422
                 ], 422);
             }
 
@@ -174,7 +182,7 @@ class ProgramsController extends Controller
     {
         try {
             $orgId = Auth::user()->org_id;
-
+            
             $req = TrainingRequirement::where('requirement_id', $id)
                 ->where('org_id', $orgId)
                 ->firstOrFail();
@@ -204,10 +212,12 @@ class ProgramsController extends Controller
     public function initiatePayment(Request $request)
     {
         try {
-            $request->validate([
-                'requirement_id' => 'required|exists:training_requirements,requirement_id'
-            ]);
-
+            if(!$request->requirement_id){
+                return response()->json([
+                    'success' => false,
+                    'message' => 'requirement_id is required'
+                ], 422);
+            }
             $orgId = Auth::user()->org_id;
 
             $requirement = TrainingRequirement::with('program')
@@ -294,12 +304,20 @@ class ProgramsController extends Controller
     public function verifyPayment(Request $request)
     {
         try {
-            $request->validate([
+            $validator = Validator::make($request->all(), [
                 'razorpay_order_id' => 'required',
                 'razorpay_payment_id' => 'required',
                 'razorpay_signature' => 'required',
                 'booking_id' => 'required|exists:bookings,booking_id'
             ]);
+            
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors'  => $validator->errors(),
+                ], 422);
+            }
 
             $api = new Api(config('services.razorpay.key'), config('services.razorpay.secret'));
 
