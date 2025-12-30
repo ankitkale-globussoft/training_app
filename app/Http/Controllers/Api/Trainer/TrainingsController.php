@@ -99,9 +99,12 @@ class TrainingsController extends Controller
     public function acceptTraining(Request $request)
     {
         try {
-            $request->validate([
-                'requirement_id' => 'required|integer'
-            ]);
+            if (!$request->requirement_id) {
+                return response()->json([
+                    'success' => false,
+                    'message'     => 'requirement_id is required'
+                ], 422);
+            }
 
             $trainerId = Auth::user()->trainer_id;
 

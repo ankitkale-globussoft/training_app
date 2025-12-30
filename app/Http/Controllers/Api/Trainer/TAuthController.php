@@ -135,7 +135,7 @@ class TAuthController extends Controller
             'biodata'       => 'required|string',
             'achievements'  => 'nullable|string',
 
-            'for_org_type'  => 'required|string|in:school,coorporate',
+            'for_org_type'  => 'required|string|in:school,coorporate,both',
             'availability'  => 'required|string|max:255',
             'training_mode' => 'required|string|in:online,offline,both',
 
@@ -290,10 +290,10 @@ class TAuthController extends Controller
 
         $validator = Validator::make($request->all(), [
             'name'          => 'sometimes|required|string|max:255',
-            'email'         => 'sometimes|required|email|unique:trainers,email,' . $trainer->id,
+            'email'         => 'sometimes|required|email|unique:trainers,email,' . $trainer->trainer_id . ',trainer_id',
             'password'      => 'sometimes|nullable|min:6|max:32',
 
-            'phone'         => 'sometimes|nullable|string|max:15|unique:trainers,phone,' . $trainer->id,
+            'phone'         => 'sometimes|nullable|string|max:15|unique:trainers,phone,' . $trainer->trainer_id . ',trainer_id',
             'addr_line1'    => 'sometimes|required|string|max:255',
             'addr_line2'    => 'sometimes|nullable|string|max:255',
             'city'          => 'sometimes|required|string|max:255',
@@ -306,9 +306,9 @@ class TAuthController extends Controller
             'biodata'       => 'sometimes|nullable|string',
             'achievements'  => 'sometimes|nullable|string',
 
-            'for_org_type'  => 'sometimes|required|string|in:government,private,ngo,other',
+            'for_org_type'  => 'sometimes|required|string|in:school,coorporate,both',
             'availability'  => 'sometimes|required|string|max:255',
-            'training_mode' => 'sometimes|required|string|in:online,offline,hybrid',
+            'training_mode' => 'sometimes|required|string|in:online,offline,both',
 
             'signed_form_pdf' => 'sometimes|nullable|file|mimes:pdf|max:5120'
         ]);

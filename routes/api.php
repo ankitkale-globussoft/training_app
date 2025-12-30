@@ -52,10 +52,10 @@ Route::post('trainer/signup', [TAuthController::class, 'signup']);
 Route::middleware(['auth:sanctum', 'trainer.api'])->group(function () {
     // Route::get('dashboard', [TrainerDashboardController::class, 'index']);
 
-    Route::patch('trainer/{id}', [TAuthController::class, 'update']);
+    Route::post('trainer/{id}', [TAuthController::class, 'update']);
     Route::get('trainer/{id}', [TAuthController::class, 'show']);
-    Route::delete('trainer/{id}', [TAuthController::class, 'destroy']);
-    Route::get('trainers', [TAuthController::class, 'index']);
+    //Route::delete('trainer/{id}', [TAuthController::class, 'destroy']);
+    //Route::get('trainers', [TAuthController::class, 'index']);
 
     // Trainings
     Route::get('open-trainings', [TrainerTrainingsController::class, 'open_trainings']);

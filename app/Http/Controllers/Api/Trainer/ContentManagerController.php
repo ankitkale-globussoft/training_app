@@ -143,6 +143,12 @@ class ContentManagerController extends Controller
     {
         try {
             $trainerId = Auth::user()->trainer_id;
+            if (!$request->booking_id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'booking_id is required'
+                ], 422);
+            }
             $bookingId = $request->booking_id;
 
             $booking = Booking::with('requirement')->where('booking_id', $bookingId)
@@ -160,7 +166,6 @@ class ContentManagerController extends Controller
                     'success' => false,
                     'message' => 'Validation failed',
                     'data' => $validator->errors(),
-                    'status' => 422
                 ], 422);
             }
 
@@ -169,19 +174,27 @@ class ContentManagerController extends Controller
 
             foreach ($request->content_types as $type) {
                 $rules = [];
-                if ($type == 'video')
+                $messages = [];
+
+                if ($type == 'video') {
                     $rules['video_file'] = 'required|file|mimes:mp4,avi,mov,wmv|max:102400';
-                elseif ($type == 'text')
+                    $messages['video_file.required'] = 'Video file is required.';
+                } elseif ($type == 'text') {
                     $rules['text_content'] = 'required|string';
-                elseif ($type == 'pdf')
+                    $messages['text_content.required'] = 'Text content is required.';
+                } elseif ($type == 'pdf') {
                     $rules['pdf_file'] = 'required|file|mimes:pdf|max:25600';
-                elseif ($type == 'link')
+                    $messages['pdf_file.required'] = 'PDF file is required.';
+                } elseif ($type == 'link') {
                     $rules['external_url'] = 'required|url|max:500';
-                elseif ($type == 'meeting')
+                    $messages['external_url.required'] = 'External URL is required.';
+                } elseif ($type == 'meeting') {
                     $rules['meeting_url'] = 'required|url|max:500';
+                    $messages['meeting_url.required'] = 'Meeting URL is required.';
+                }
 
                 if (!empty($rules)) {
-                    $typeValidator = Validator::make($request->all(), $rules);
+                    $typeValidator = Validator::make($request->all(), $rules, $messages);
                     if ($typeValidator->fails()) {
                         $errors[$type] = $typeValidator->errors()->all();
                         continue;
@@ -219,7 +232,6 @@ class ContentManagerController extends Controller
                     'success' => false,
                     'message' => 'Failed to add content items',
                     'data' => $errors,
-                    'status' => 422
                 ], 422);
             }
 
@@ -255,21 +267,26 @@ class ContentManagerController extends Controller
                 'content_type' => 'required|in:video,text,pdf,link,meeting',
             ];
 
-            $type = $request->content_type ?? $content->content_type;
-            if ($type == 'text')
-                $rules['text_content'] = 'required|string';
-            elseif ($type == 'link')
-                $rules['external_url'] = 'required|url|max:500';
-            elseif ($type == 'meeting')
-                $rules['meeting_url'] = 'required|url|max:500';
+            $messages = [];
 
-            $validator = Validator::make($request->all(), $rules);
+            $type = $request->content_type ?? $content->content_type;
+            if ($type == 'text') {
+                $rules['text_content'] = 'required|string';
+                $messages['text_content.required'] = 'Text content is required.';
+            } elseif ($type == 'link') {
+                $rules['external_url'] = 'required|url|max:500';
+                $messages['external_url.required'] = 'External URL is required.';
+            } elseif ($type == 'meeting') {
+                $rules['meeting_url'] = 'required|url|max:500';
+                $messages['meeting_url.required'] = 'Meeting URL is required.';
+            }
+
+            $validator = Validator::make($request->all(), $rules, $messages);
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Validation failed',
                     'data' => $validator->errors(),
-                    'status' => 422
                 ], 422);
             }
 
