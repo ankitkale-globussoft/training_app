@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Web\Admin\AdminController;
+use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Web\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Web\Admin\PaymentController;
 use App\Http\Controllers\Web\Admin\ProgramController;
@@ -80,6 +81,28 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('trainer-payments', [PaymentController::class, 'viewTrainerPayments'])->name('payments.trainer-payments');
         Route::get('trainer-bank-details/{id}', [PaymentController::class, 'getTrainerBankDetails'])->name('payments.bank-details');
         Route::post('update-status', [PaymentController::class, 'updatePaymentStatus'])->name('payments.update-status');
+
+        // blog categories
+        Route::controller(App\Http\Controllers\Admin\BlogCategoryController::class)->prefix('blog-categories')->name('blog-categories.')->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/fetch', 'fetch')->name('fetch');
+            Route::get('/fetch-all', 'fetchAll')->name('fetch-all'); // For dropdowns
+            Route::post('/store', 'store')->name('store');
+            Route::get('/{id}/edit', 'edit')->name('edit');
+            Route::post('/{id}/update', 'update')->name('update');
+            Route::delete('/{id}', 'destroy')->name('destroy');
+        });
+
+        // blogs
+        Route::controller(BlogController::class)->prefix('blogs')->name('blogs.')->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/fetch', 'fetchBlogs')->name('fetch');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/store', 'store')->name('store');
+            Route::get('/{id}/edit', 'edit')->name('edit');
+            Route::post('/{id}/update', 'update')->name('update');
+            Route::delete('/{id}', 'destroy')->name('destroy');
+        });
 
         Route::get('logout', [AdminAuthController::class, 'logout'])->name('logout');
     });
