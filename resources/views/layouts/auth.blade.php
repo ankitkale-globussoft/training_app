@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
+<head> 
     {{-- @include('layouts.head') --}}
     <meta charset="utf-8" />
     <meta
@@ -12,7 +12,7 @@
     <title>@yield('title', config('app.name'))</title>
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
+   
 
     <meta name="description" content="" />
 

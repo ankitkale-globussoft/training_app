@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Test extends Model
 {
     protected $primaryKey = 'test_id';
-    protected $fillable = ['program_id', 'duration'];
+    protected $fillable = ['program_id', 'duration', 'title', 'total_marks'];
 
     public function program(): BelongsTo
     {

@@ -55,6 +55,14 @@ return [
         'org_api' => [
             'driver' => 'sanctum',
             'provider' => 'organizations'
+        ],
+        'student_web' => [
+            'driver' => 'session',
+            'provider' => 'students'
+        ],
+        'student_api' => [
+            'driver' => 'sanctum',
+            'provider' => 'students'
         ]
     ],
 
@@ -89,6 +97,11 @@ return [
         'organizations' => [
             'driver' => 'eloquent',
             'model' => App\Models\Organization::class,
+        ],
+
+        'students' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Candidate::class,
         ]
 
         // 'users' => [

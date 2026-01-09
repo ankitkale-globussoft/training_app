@@ -11,7 +11,7 @@ class Attempt extends Model
     protected $casts = [
         'answers' => 'array',
     ];
-    protected $fillable = ['candidate_id', 'test_id', 'answers', 'score', 'certificate_id'];
+    protected $fillable = ['candidate_id', 'test_id', 'answers', 'score', 'certificate_id', 'time_taken'];
 
     public function candidate(): BelongsTo
     {

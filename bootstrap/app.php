@@ -17,7 +17,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'trainer.api' => \App\Http\Middleware\IsTrainer::class,
             'trainer.web' => \App\Http\Middleware\IsTrainerWeb::class,
             'org.web' => \App\Http\Middleware\IsOrgWeb::class,
-            'org.api' => \App\Http\Middleware\IsOrgApi::class
+            'org.api' => \App\Http\Middleware\IsOrgApi::class,
+            'student.web' => \App\Http\Middleware\IsStudentWeb::class,
+            'student.api' => \App\Http\Middleware\IsStudentApi::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

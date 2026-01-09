@@ -43,8 +43,16 @@
             </a>
         </li>
 
+        <li class="menu-item {{ request()->routeIs('org.students.*') ? 'active' : '' }}">
+            <a href="{{ route('org.students.index') }}" class="menu-link"><i
+                    class="menu-icon tf-icons bx bx-user-voice"></i>
+                <div data-i18n="Students">Students</div>
+            </a>
+        </li>
+
         <li class="menu-item {{ request()->routeIs('purchases.*') ? 'active' : '' }}">
-            <a href="{{ route('org.purchases.index') }}" class="menu-link"><i class="menu-icon tf-icons bx bx-receipt"></i>
+            <a href="{{ route('org.purchases.index') }}" class="menu-link"><i
+                    class="menu-icon tf-icons bx bx-receipt"></i>
                 <div data-i18n="Purchases">Purchases</div>
             </a>
         </li>

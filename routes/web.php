@@ -20,6 +20,7 @@ use App\Http\Controllers\Web\Trainer\PaymentController as TrainerPaymentControll
 use App\Http\Controllers\Web\Trainer\TrainerController;
 use App\Http\Controllers\Web\Trainer\TrainerProgramsController;
 use App\Http\Controllers\Web\Trainer\TrainingsController;
+use App\Http\Controllers\Web\Student\AuthController as StudentAuthController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TestMail;
@@ -72,6 +73,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // tests
         Route::resource('test', TestController::class);
+        Route::get('test/{id}/questions', [TestController::class, 'getQuestions'])->name('test.questions');
+        Route::post('test/question/add', [TestController::class, 'addQuestion'])->name('test.question.add');
+        Route::post('test/question/{id}/update', [TestController::class, 'updateQuestion'])->name('test.question.update');
+        Route::delete('test/question/{id}/delete', [TestController::class, 'deleteQuestion'])->name('test.question.delete');
 
         // payments
         Route::get('payments', [PaymentController::class, 'view'])->name('payments');
@@ -205,6 +210,40 @@ Route::prefix('org')->name('org.')->group(function () {
         Route::get('purchases', [PurchaseController::class, 'index'])->name('purchases.index');
         Route::get('purchases/{booking_id}/invoice', [PurchaseController::class, 'invoice'])->name('purchases.invoice');
 
+        // Student Management
+        Route::controller(App\Http\Controllers\Web\Org\StudentController::class)->prefix('students')->name('students.')->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::post('/store', 'store')->name('store');
+            Route::post('/{id}/update', 'update')->name('update');
+            Route::delete('/{id}', 'destroy')->name('destroy');
+            Route::post('/{id}/toggle-status', 'toggleStatus')->name('toggle-status');
+            Route::post('/import', 'import')->name('import');
+        });
+
         Route::get('logout', [OrgAuthController::class, 'logout'])->name('logout');
+    });
+});
+
+Route::prefix('student')->name('student.')->group(function () {
+    Route::get('login', [StudentAuthController::class, 'showLoginForm'])->name('login');
+    Route::post('login', [StudentAuthController::class, 'login'])->name('login');
+
+    // Student protected routes
+    Route::middleware('student.web')->group(function () {
+        Route::get('home', function () {
+            return view('student.home');
+        })->name('home');
+
+        // Test Routes
+        Route::controller(App\Http\Controllers\Web\Student\TestController::class)->prefix('tests')->name('tests.')->group(function () {
+            Route::get('/available', 'available')->name('available');
+            Route::get('/{test_id}/attempt', 'show')->name('show');
+            Route::get('/{test_id}/data', 'getTest')->name('data');
+            Route::post('/submit', 'submit')->name('submit');
+            Route::get('/attempted', 'attempted')->name('attempted');
+            Route::get('/result/{attempt_id}', 'result')->name('result');
+        });
+
+        Route::get('logout', [StudentAuthController::class, 'logout'])->name('logout');
     });
 });
