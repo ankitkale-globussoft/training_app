@@ -31,6 +31,11 @@ Route::get('/send-test-mail/{email}', function ($email) {
     return "Mail sent successfully to $email!";
 });
 
+Route::prefix('common')->group(function () {
+    Route::post('send-otp', [App\Http\Controllers\Web\Common\EmailVerificationController::class, 'sendOtp'])->name('common.send-otp');
+    Route::post('verify-otp', [App\Http\Controllers\Web\Common\EmailVerificationController::class, 'verifyOtp'])->name('common.verify-otp');
+});
+
 Route::get('/', function () {
     return view('home');
 })->name('home');

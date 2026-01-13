@@ -29,8 +29,7 @@
                             <!-- Organisation Name -->
                             <div class="mb-3">
                                 <label class="form-label">Organisation Name</label>
-                                <input type="text" id="name" name="name" class="form-control"
-                                    placeholder="ABC Pvt Ltd">
+                                <input type="text" id="name" name="name" class="form-control" placeholder="ABC Pvt Ltd">
                                 <div class="invalid-feedback"></div>
                             </div>
 
@@ -45,10 +44,30 @@
                             <!-- Email -->
                             <div class="mb-3">
                                 <label class="form-label">Email</label>
-                                <input type="email" id="email" name="email" class="form-control"
-                                    placeholder="org@email.com">
+                                <div class="input-group">
+                                    <input type="email" id="email" name="email" class="form-control"
+                                        placeholder="org@email.com">
+                                    <button class="btn btn-outline-primary" type="button"
+                                        id="btnVerifyEmail">Verify</button>
+                                </div>
                                 <div class="invalid-feedback"></div>
                             </div>
+
+                            <!-- OTP Section -->
+                            <div class="mb-3 d-none" id="otpSection">
+                                <label class="form-label">Enter Verification Code</label>
+                                <div class="input-group">
+                                    <input type="text" id="otp" class="form-control" placeholder="6-digit code">
+                                    <button class="btn btn-primary" type="button" id="btnSubmitOtp">Verify Code</button>
+                                </div>
+                                <div class="d-flex justify-content-between mt-1">
+                                    <small class="text-muted" id="otpTimer"></small>
+                                    <a href="javascript:void(0);" id="btnResendOtp" class="small d-none">Resend OTP</a>
+                                </div>
+                                <small class="text-danger d-none" id="otpError"></small>
+                            </div>
+
+                            <input type="hidden" id="is_email_verified" value="0">
 
                             <!-- Mobile -->
                             <div class="mb-3">
@@ -160,7 +179,7 @@
         /* =============================
        Password Toggle (Fixed)
     ============================= */
-        $('#togglePassword').on('click', function() {
+        $('#togglePassword').on('click', function () {
             const input = $('#password');
             const icon = $(this).find('i');
 
@@ -176,12 +195,12 @@
         /* =============================
            Image Preview
         ============================= */
-        $('#org_image').on('change', function() {
+        $('#org_image').on('change', function () {
             const file = this.files[0];
             if (!file) return;
 
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 $('#imagePreview').attr('src', e.target.result);
                 $('#imagePreviewWrapper').removeClass('d-none');
             };
@@ -197,7 +216,7 @@
         /* =============================
            AJAX Submit (FormData)
         ============================= */
-        $('#orgRegisterForm').on('submit', function(e) {
+        $('#orgRegisterForm').on('submit', function (e) {
             e.preventDefault();
             clearErrors();
 
@@ -215,10 +234,10 @@
                 data: formData,
                 processData: false,
                 contentType: false,
-                success: function(res) {
+                success: function (res) {
                     window.location.href = res.redirect;
                 },
-                error: function(xhr) {
+                error: function (xhr) {
                     btn.prop('disabled', false).text('Sign up');
                     if (xhr.status === 422) {
                         showErrors(xhr.responseJSON.errors);
@@ -236,11 +255,144 @@
         }
 
         function showErrors(errors) {
-            $.each(errors, function(field, messages) {
+            $.each(errors, function (field, messages) {
                 let input = $('#' + field);
                 input.addClass('is-invalid');
                 input.next('.invalid-feedback').text(messages[0]);
             });
+        }
+
+        /* =============================
+           OTP Verification Logic
+        ============================= */
+        let otpTimerInterval;
+
+        // Disable submit button initially
+        $('#submitBtn').prop('disabled', true);
+
+        // Send OTP
+        $('#btnVerifyEmail').on('click', function() {
+            let email = $('#email').val();
+            let btn = $(this);
+            let errorDiv = $('#email').closest('.mb-3').find('.invalid-feedback');
+
+            if (!email) {
+                $('#email').addClass('is-invalid');
+                errorDiv.text('Please enter email first.');
+                return;
+            }
+
+            btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span>');
+            $('#email').removeClass('is-invalid'); 
+
+            $.ajax({
+                url: "{{ route('common.send-otp') }}",
+                type: "POST",
+                data: {
+                    email: email,
+                    type: 'org',
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function(res) {
+                    btn.html('Verify').prop('disabled', true); 
+                    // Show OTP section
+                    $('#otpSection').removeClass('d-none');
+                    startTimer(600); // 10 mins (matches cache)
+                    $('#otpError').addClass('d-none').text('');
+                    alert(res.message);
+                },
+                error: function(xhr) {
+                    btn.prop('disabled', false).html('Verify');
+                    if (xhr.status === 422) {
+                        let errors = xhr.responseJSON.errors;
+                        $('#email').addClass('is-invalid');
+                        errorDiv.text(errors.email[0]);
+                    } else {
+                        alert('Something went wrong. Please try again.');
+                    }
+                }
+            });
+        });
+
+        // Verify OTP
+        $('#btnSubmitOtp').on('click', function() {
+            let otp = $('#otp').val();
+            let email = $('#email').val();
+            let btn = $(this);
+
+            if (!otp) {
+                $('#otpError').removeClass('d-none').text('Please enter OTP.');
+                return;
+            }
+
+            btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span>');
+            $('#otpError').addClass('d-none');
+
+            $.ajax({
+                url: "{{ route('common.verify-otp') }}",
+                type: "POST",
+                data: {
+                    email: email,
+                    otp: otp,
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function(res) {
+                    btn.html('Verified').removeClass('btn-primary').addClass('btn-success');
+                    $('#otp').prop('readonly', true);
+                    $('#email').prop('readonly', true);
+                    $('#btnVerifyEmail').addClass('d-none'); // Hide verify btn
+                    
+                    $('#otpSection').addClass('d-none'); // Optional: hide OTP section or keep it? 
+                    // Let's keep it but show verified status. 
+                    // Actually, prompt says "after that a feild should come... on clicking verify btn validate".
+                    // I'll show a success indicator next to email maybe? 
+                    // For now, simplify: Verify button becomes "Verified" (green), OTP section hides.
+                    $('#email').closest('.input-group').find('button').replaceWith('<button class="btn btn-success" type="button" disabled><i class="bx bx-check"></i> Verified</button>');
+                    $('#otpSection').remove();
+
+                    $('#is_email_verified').val('1');
+                    $('#submitBtn').prop('disabled', false); // Enable Register
+                    
+                    clearInterval(otpTimerInterval);
+                    alert(res.message);
+                },
+                error: function(xhr) {
+                    btn.prop('disabled', false).html('Verify Code');
+                    if (xhr.status === 422) {
+                        $('#otpError').removeClass('d-none').text(xhr.responseJSON.errors.otp[0]);
+                    } else {
+                        $('#otpError').removeClass('d-none').text('Invalid OTP.');
+                    }
+                }
+            });
+        });
+
+        // Resend OTP
+        $('#btnResendOtp').on('click', function() {
+            $('#btnVerifyEmail').trigger('click');
+        });
+
+        function startTimer(duration) {
+            let timer = duration, minutes, seconds;
+            $('#btnResendOtp').addClass('d-none');
+            
+            clearInterval(otpTimerInterval);
+            otpTimerInterval = setInterval(function () {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                $('#otpTimer').text(minutes + ":" + seconds);
+
+                if (--timer < 0) {
+                    clearInterval(otpTimerInterval);
+                    $('#otpTimer').text("Expired");
+                    $('#btnResendOtp').removeClass('d-none');
+                    $('#btnVerifyEmail').prop('disabled', false); // Allow resending via Verify button too
+                }
+            }, 1000);
         }
     </script>
 @endpush
