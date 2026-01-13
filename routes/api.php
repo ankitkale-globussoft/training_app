@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\Trainer\ContentManagerController;
 use App\Http\Controllers\Api\Trainer\TrainerProgramsController;
 use App\Http\Controllers\Api\Trainer\DashboardController as TrainerDashboardController;
 use App\Http\Controllers\Api\Org\AuthController as OrgAuthController;
+use App\Http\Controllers\Api\Org\StudentController;
 use App\Http\Controllers\Api\Trainer\TAuthController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
@@ -106,6 +107,16 @@ Route::prefix('org/')->group(function () {
         // Payments
         Route::post('programs/payment/initiate', [OrgProgramsController::class, 'initiatePayment']);
         Route::post('programs/payment/verify', [OrgProgramsController::class, 'verifyPayment']);
+
+        // Student Management
+        Route::controller(StudentController::class)->prefix('students')->group(function () {
+            Route::get('/', 'index');
+            Route::post('/store', 'store');
+            Route::post('/{id}/update', 'update');
+            Route::delete('/{id}', 'destroy');
+            Route::post('/{id}/toggle-status', 'toggleStatus');
+            Route::post('/import', 'import');
+        });
     });
 });
 
