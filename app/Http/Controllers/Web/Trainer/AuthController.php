@@ -20,15 +20,15 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'login'    => 'required|string',
+            'login' => 'required|string',
             'password' => 'required|string'
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors'  => $validator->errors(),
-                'msg'     => 'Validation failed'
+                'errors' => $validator->errors(),
+                'msg' => 'Validation failed'
             ], 422);
         }
 
@@ -67,35 +67,35 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name'          => 'required|string|max:255',
-            'email'         => 'required|email|unique:trainers,email',
-            'password'      => 'required|min:6|max:32',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:trainers,email',
+            'password' => 'required|min:6|max:32',
 
-            'phone'         => 'required|string|digits:10|unique:trainers,phone',
-            'addr_line1'    => 'required|string|max:255',
-            'addr_line2'    => 'nullable|string|max:255',
-            'city'          => 'required|string|max:255',
-            'state'         => 'required|string|max:255',
-            'district'      => 'required|string|max:255',
-            'pincode'       => 'required|digits:6',
+            'phone' => 'required|string|digits:10|unique:trainers,phone',
+            'addr_line1' => 'required|string|max:255',
+            'addr_line2' => 'nullable|string|max:255',
+            'city' => 'required|string|max:255',
+            'state' => 'required|string|max:255',
+            'district' => 'required|string|max:255',
+            'pincode' => 'required|digits:6',
 
-            'resume_link'   => 'required|url|max:500',
-            'profile_pic'   => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'biodata'       => 'required|string',
-            'achievements'  => 'nullable|string',
+            'resume_link' => 'required|url|max:500',
+            'profile_pic' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'biodata' => 'required|string',
+            'achievements' => 'nullable|string',
 
-            'for_org_type'  => 'required|string|in:school,corporate,both',
-            'availability'  => 'required|string|max:255',
+            'for_org_type' => 'required|string|in:school,corporate,both',
+            'availability' => 'required|string|max:255',
             'training_mode' => 'required|string|in:online,offline,both',
 
-            'signed_form_pdf' => 'required|file|mimes:pdf|max:5120'
+            'signed_form_pdf' => 'nullable|file|mimes:pdf|max:5120'
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors'  => $validator->errors(),
-                'msg'     => 'Validation failed'
+                'errors' => $validator->errors(),
+                'msg' => 'Validation failed'
             ], 422);
         }
 
@@ -114,12 +114,12 @@ class AuthController extends Controller
 
         $trainer = Trainer::create($validated);
 
-        Auth::login($trainer);
+        Auth::guard('trainer_web')->login($trainer);
         $request->session()->regenerate();
 
         return response()->json([
             'success' => true,
-            'msg'     => 'Trainer signup successful',
+            'msg' => 'Trainer signup successful',
             'redirect' => route('trainer.dashboard')
         ], 201);
     }
@@ -192,21 +192,21 @@ class AuthController extends Controller
         /* =====================
        MANUAL FIELD ASSIGN
     ===================== */
-        $trainer->name          = $request->name;
-        $trainer->email         = $request->email;
-        $trainer->phone         = $request->phone;
-        $trainer->addr_line1    = $request->addr_line1;
-        $trainer->addr_line2    = $request->addr_line2;
-        $trainer->city          = $request->city;
-        $trainer->district      = $request->district;
-        $trainer->state         = $request->state;
-        $trainer->pincode       = $request->pincode;
-        $trainer->resume_link   = $request->resume_link;
-        $trainer->biodata       = $request->biodata;
-        $trainer->achievements  = $request->achievements;
-        $trainer->for_org_type  = $request->for_org_type;
+        $trainer->name = $request->name;
+        $trainer->email = $request->email;
+        $trainer->phone = $request->phone;
+        $trainer->addr_line1 = $request->addr_line1;
+        $trainer->addr_line2 = $request->addr_line2;
+        $trainer->city = $request->city;
+        $trainer->district = $request->district;
+        $trainer->state = $request->state;
+        $trainer->pincode = $request->pincode;
+        $trainer->resume_link = $request->resume_link;
+        $trainer->biodata = $request->biodata;
+        $trainer->achievements = $request->achievements;
+        $trainer->for_org_type = $request->for_org_type;
         $trainer->training_mode = $request->training_mode;
-        $trainer->availability  = $request->availability;
+        $trainer->availability = $request->availability;
 
         // ✅ REAL ELOQUENT SAVE
         $trainer->save();
@@ -214,6 +214,36 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Trainer profile updated successfully'
         ]);
+    }
+
+
+    public function uploadSignedForm(Request $request)
+    {
+        $trainer = Trainer::findOrFail(Auth::guard('trainer_web')->user()->trainer_id);
+
+        $request->validate([
+            'signed_form_pdf' => 'required|file|mimes:pdf|max:5120'
+        ]);
+
+        if ($request->hasFile('signed_form_pdf')) {
+            if ($trainer->signed_form_pdf && Storage::disk('public')->exists($trainer->signed_form_pdf)) {
+                Storage::disk('public')->delete($trainer->signed_form_pdf);
+            }
+            $trainer->signed_form_pdf =
+                $request->file('signed_form_pdf')->store('trainer_signed_forms', 'public');
+
+            $trainer->save();
+
+            return response()->json([
+                'success' => true,
+                'msg' => 'Signed form uploaded successfully'
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'msg' => 'No file uploaded'
+        ], 422);
     }
 
 

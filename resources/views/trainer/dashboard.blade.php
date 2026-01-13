@@ -22,6 +22,40 @@
                                     <i class="bx bx-log-out me-1"></i> Log Out
                                 </a>
                             </div>
+
+                            <hr class="my-4">
+
+                            <div class="mt-4 text-start">
+                                <h5 class="fw-bold mb-3">Signed Agreement Form</h5>
+                                @php
+                                    $trainer = Auth::guard('trainer_web')->user();
+                                @endphp
+                                @if($trainer->signed_form_pdf)
+                                    <div class="alert alert-success d-flex align-items-center mb-3">
+                                        <i class="bx bx-check-circle me-2"></i>
+                                        <span>You have already uploaded the signed form. 
+                                            <a href="{{ asset('storage/' . $trainer->signed_form_pdf) }}" target="_blank" class="fw-bold text-decoration-underline text-success">View current form</a>
+                                        </span>
+                                    </div>
+                                @else
+                                    <div class="alert alert-warning d-flex align-items-center mb-3">
+                                        <i class="bx bx-error me-2"></i>
+                                        <span>Please upload your signed agreement form to expedite the verification process.</span>
+                                    </div>
+                                @endif
+
+                                <form id="uploadSignedForm" enctype="multipart/form-data">
+                                    @csrf
+                                    <div class="mb-3">
+                                        <label for="signed_form_pdf" class="form-label">Upload Signed Form (PDF only, max 5MB)</label>
+                                        <input class="form-control" type="file" id="signed_form_pdf" name="signed_form_pdf" accept=".pdf" required>
+                                        <div class="invalid-feedback" id="error-signed_form_pdf"></div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100" id="uploadBtn">
+                                        <i class="bx bx-upload me-1"></i> Upload Form
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -195,106 +229,150 @@
 @endsection
 
 @push('ajax')
-    data: earningsData
-    }],
-    chart: {
-    height: 350,
-    type: 'bar',
-    toolbar: { show: false }
-    },
-    plotOptions: {
-    bar: {
-    borderRadius: 5,
-    dataLabels: { position: 'top' }, // top, center, bottom
-    columnWidth: '40%'
-    }
-    },
-    dataLabels: {
-    enabled: true,
-    formatter: function (val) {
-    return val > 0 ? "$" + val : "";
-    },
-    offsetY: -20,
-    style: {
-    fontSize: '12px',
-    colors: ["#304758"]
-    }
-    },
-    xaxis: {
-    categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-    position: 'bottom',
-    axisBorder: { show: false },
-    axisTicks: { show: false },
-    tooltip: { enabled: true }
-    },
-    yaxis: {
-    axisBorder: { show: false },
-    axisTicks: { show: false },
-    labels: {
-    show: true,
-    formatter: function (val) {
-    return "$" + val;
-    }
-    }
-    },
-    colors: ['#696cff'], // Primary color from Sneat
-    grid: {
-    borderColor: '#f1f1f1'
-    }
-    };
+<script>
+    $(document).ready(function() {
 
-    const earningsChart = new ApexCharts(document.querySelector("#earningsChart"), earningsChartOptions);
-    earningsChart.render();
+        // --- Upload Signed Form AJAX ---
+        $('#uploadSignedForm').on('submit', function(e) {
+            e.preventDefault();
+            $('.invalid-feedback').text('');
+            $('.form-control').removeClass('is-invalid');
+            
+            // Loading State as requested
+            $('#uploadBtn').prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span> Uploading...');
 
+            let formData = new FormData(this);
+            $.ajax({
+                url: "{{ route('trainer.upload-signed-form') }}",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.success) {
+                        window.location.reload();
+                    }
+                },
+                error: function(xhr) {
+                    $('#uploadBtn').prop('disabled', false).html('<i class="bx bx-upload me-1"></i> Upload Form');
+                    if (xhr.status === 422) {
+                        let errors = xhr.responseJSON.errors;
+                        $.each(errors, function(key, value) {
+                            $('#' + key).addClass('is-invalid');
+                            $('#error-' + key).text(value[0]);
+                        });
+                    } else {
+                        alert('An error occurred during upload. Please try again.');
+                    }
+                }
+            });
+        });
 
-    // --- Program Popularity Chart ---
-    const programLabels = @json($programLabels);
-    const programData = @json($programData);
+        // --- Charts (Only if elements exist) ---
+        if (document.querySelector("#earningsChart")) {
+            const earningsData = @json($earningsData ?? []);
+            const earningsChartOptions = {
+                series: [{
+                    name: 'Earnings',
+                    data: earningsData
+                }],
+                chart: {
+                    height: 350,
+                    type: 'bar',
+                    toolbar: { show: false }
+                },
+                plotOptions: {
+                    bar: {
+                        borderRadius: 5,
+                        dataLabels: { position: 'top' }, 
+                        columnWidth: '40%'
+                    }
+                },
+                dataLabels: {
+                    enabled: true,
+                    formatter: function (val) {
+                        return val > 0 ? "₹" + val : "";
+                    },
+                    offsetY: -20,
+                    style: {
+                        fontSize: '12px',
+                        colors: ["#304758"]
+                    }
+                },
+                xaxis: {
+                    categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                    position: 'bottom',
+                    axisBorder: { show: false },
+                    axisTicks: { show: false },
+                    tooltip: { enabled: true }
+                },
+                yaxis: {
+                    axisBorder: { show: false },
+                    axisTicks: { show: false },
+                    labels: {
+                        show: true,
+                        formatter: function (val) {
+                            return "₹" + val;
+                        }
+                    }
+                },
+                colors: ['#696cff'], 
+                grid: {
+                    borderColor: '#f1f1f1'
+                }
+            };
 
-    // If no data, show placeholder or empty chart behavior
-    if (programData.length > 0) {
-    const programChartOptions = {
-    series: programData,
-    chart: {
-    width: '100%',
-    type: 'donut',
-    },
-    labels: programLabels,
-    plotOptions: {
-    pie: {
-    donut: {
-    size: '65%',
-    labels: {
-    show: true,
-    name: {
-    fontSize: '1rem',
-    fontFamily: 'Public Sans'
-    },
-    value: {
-    fontSize: '1.2rem',
-    color: '#566a7f',
-    fontFamily: 'Public Sans',
-    formatter: function (val) {
-    return val;
-    }
-    }
-    }
-    }
-    }
-    },
-    legend: {
-    position: 'bottom'
-    },
-    colors: ['#696cff', '#71dd37', '#03c3ec', '#8592a3', '#ff3e1d'] // Sneat colors
-    };
+            const earningsChart = new ApexCharts(document.querySelector("#earningsChart"), earningsChartOptions);
+            earningsChart.render();
+        }
 
-    const programChart = new ApexCharts(document.querySelector("#programChart"), programChartOptions);
-    programChart.render();
-    } else {
-    document.querySelector("#programChart").innerHTML = "<p class='text-center mt-5 text-muted'>No booking data available.
-    </p>";
-    }
+        if (document.querySelector("#programChart")) {
+            const programLabels = @json($programLabels ?? []);
+            const programData = @json($programData ?? []);
+
+            if (programData.length > 0) {
+                const programChartOptions = {
+                    series: programData,
+                    chart: {
+                        width: '100%',
+                        type: 'donut',
+                    },
+                    labels: programLabels,
+                    plotOptions: {
+                        pie: {
+                            donut: {
+                                size: '65%',
+                                labels: {
+                                    show: true,
+                                    name: {
+                                        fontSize: '1rem',
+                                        fontFamily: 'Public Sans'
+                                    },
+                                    value: {
+                                        fontSize: '1.2rem',
+                                        color: '#566a7f',
+                                        fontFamily: 'Public Sans',
+                                        formatter: function (val) {
+                                            return val;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    legend: {
+                        position: 'bottom'
+                    },
+                    colors: ['#696cff', '#71dd37', '#03c3ec', '#8592a3', '#ff3e1d'] 
+                };
+
+                const programChart = new ApexCharts(document.querySelector("#programChart"), programChartOptions);
+                programChart.render();
+            } else {
+                document.querySelector("#programChart").innerHTML = "<p class='text-center mt-5 text-muted'>No booking data available.</p>";
+            }
+        }
 
     });
-    </script>
+</script>
 @endpush

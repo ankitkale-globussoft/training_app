@@ -130,6 +130,7 @@ Route::prefix('trainer')->name('trainer.')->group(function () {
         })->name('profile');
 
         Route::post('profile', [TrainerAuthController::class, 'update'])->name('profile.update');
+        Route::post('upload-signed-form', [TrainerAuthController::class, 'uploadSignedForm'])->name('upload-signed-form');
 
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 

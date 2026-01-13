@@ -29,18 +29,22 @@ class IsTrainer
 
         // Check if trainer is verified
         if ($user->verified === 'pending') {
-            return response()->json([
-                'success' => false,
-                'msg' => 'Your account is waiting for verification. Please wait until an admin approves your profile.'
-            ], 403);
+            if ($request->route()->getName() !== 'api.trainer.upload-signed-form') {
+                return response()->json([
+                    'success' => false,
+                    'msg' => 'Your account is waiting for verification. Please wait until an admin approves your profile.'
+                ], 403);
+            }
         }
 
         // Check if trainer is suspended
         if ($user->verified === 'suspended') {
-            return response()->json([
-                'success' => false,
-                'msg' => 'Your account has been suspended. Please contact administration for more details.'
-            ], 403);
+            if ($request->route()->getName() !== 'api.trainer.upload-signed-form') {
+                return response()->json([
+                    'success' => false,
+                    'msg' => 'Your account has been suspended. Please contact administration for more details.'
+                ], 403);
+            }
         }
 
         return $next($request);

@@ -31,14 +31,14 @@ class IsTrainerWeb
         // If trainer is pending, only allow dashboard and logout
         if ($trainer->verified === 'pending') {
             // Sticking to user request: dashboard only.
-            if (!in_array($request->route()->getName(), ['trainer.dashboard', 'trainer.logout'])) {
+            if (!in_array($request->route()->getName(), ['trainer.dashboard', 'trainer.logout', 'trainer.upload-signed-form'])) {
                 return redirect()->route('trainer.dashboard')->with('info', 'Your account is waiting for verification.');
             }
         }
 
         // If trainer is suspended, only allow dashboard and logout
         if ($trainer->verified === 'suspended') {
-            if (!in_array($request->route()->getName(), ['trainer.dashboard', 'trainer.logout'])) {
+            if (!in_array($request->route()->getName(), ['trainer.dashboard', 'trainer.logout', 'trainer.upload-signed-form'])) {
                 return redirect()->route('trainer.dashboard')->with('error', 'Your account has been suspended.');
             }
         }

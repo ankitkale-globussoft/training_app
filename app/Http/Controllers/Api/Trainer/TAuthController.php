@@ -44,8 +44,8 @@ class TAuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'result'  => $trainers,
-            'msg'     => 'Trainer list fetched successfully'
+            'result' => $trainers,
+            'msg' => 'Trainer list fetched successfully'
         ], 200);
     }
 
@@ -64,15 +64,15 @@ class TAuthController extends Controller
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'login'    => 'required|string',
+            'login' => 'required|string',
             'password' => 'required|string',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'msg'     => 'Validation failed',
-                'errors'  => $validator->errors(),
+                'msg' => 'Validation failed',
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -85,7 +85,7 @@ class TAuthController extends Controller
         if (!$trainer || !Hash::check($request->password, $trainer->password)) {
             return response()->json([
                 'success' => false,
-                'msg'     => 'Invalid credentials',
+                'msg' => 'Invalid credentials',
             ], 401);
         }
 
@@ -97,9 +97,9 @@ class TAuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'msg'     => 'Login successful',
-            'data'    => [
-                'token'   => $token,
+            'msg' => 'Login successful',
+            'data' => [
+                'token' => $token,
                 'trainer' => $trainer,
             ],
         ], 200);
@@ -118,35 +118,35 @@ class TAuthController extends Controller
     public function signup(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name'          => 'required|string|max:255',
-            'email'         => 'required|email|unique:trainers,email',
-            'password'      => 'required|min:6|max:32',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:trainers,email',
+            'password' => 'required|min:6|max:32',
 
-            'phone'         => 'required|string|digits:10|unique:trainers,phone',
-            'addr_line1'    => 'required|string|max:255',
-            'addr_line2'    => 'nullable|string|max:255',
-            'city'          => 'required|string|max:255',
-            'state'         => 'required|string|max:255',
-            'district'      => 'required|string|max:255',
-            'pincode'       => 'required|digits:6',
+            'phone' => 'required|string|digits:10|unique:trainers,phone',
+            'addr_line1' => 'required|string|max:255',
+            'addr_line2' => 'nullable|string|max:255',
+            'city' => 'required|string|max:255',
+            'state' => 'required|string|max:255',
+            'district' => 'required|string|max:255',
+            'pincode' => 'required|digits:6',
 
-            'resume_link'   => 'required|url|max:500',
-            'profile_pic'   => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'biodata'       => 'required|string',
-            'achievements'  => 'nullable|string',
+            'resume_link' => 'required|url|max:500',
+            'profile_pic' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'biodata' => 'required|string',
+            'achievements' => 'nullable|string',
 
-            'for_org_type'  => 'required|string|in:school,coorporate,both',
-            'availability'  => 'required|string|max:255',
+            'for_org_type' => 'required|string|in:school,coorporate,both',
+            'availability' => 'required|string|max:255',
             'training_mode' => 'required|string|in:online,offline,both',
 
-            'signed_form_pdf' => 'required|file|mimes:pdf|max:5120'
+            'signed_form_pdf' => 'nullable|file|mimes:pdf|max:5120'
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors'  => $validator->errors(),
-                'msg'     => 'Validation failed'
+                'errors' => $validator->errors(),
+                'msg' => 'Validation failed'
             ], 422);
         }
 
@@ -170,37 +170,37 @@ class TAuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'data'  => [
+            'data' => [
                 'trainer' => $trainer,
-                'token'   => $token,
+                'token' => $token,
                 'token_type' => 'Bearer'
             ],
-            'message'     => 'Trainer signup successful'
+            'message' => 'Trainer signup successful'
         ], 201);
     }
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name'          => 'required|string|max:255',
-            'email'         => 'required|email|unique:trainers,email',
-            'password'      => 'required|min:6|max:32',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:trainers,email',
+            'password' => 'required|min:6|max:32',
 
-            'phone'         => 'nullable|string|max:15|unique:trainers,phone',
-            'addr_line1'    => 'required|string|max:255',
-            'addr_line2'    => 'nullable|string|max:255',
-            'city'          => 'required|string|max:255',
-            'state'         => 'required|string|max:255',
-            'district'      => 'required|string|max:255',
-            'pincode'       => 'required|digits:6',
+            'phone' => 'nullable|string|max:15|unique:trainers,phone',
+            'addr_line1' => 'required|string|max:255',
+            'addr_line2' => 'nullable|string|max:255',
+            'city' => 'required|string|max:255',
+            'state' => 'required|string|max:255',
+            'district' => 'required|string|max:255',
+            'pincode' => 'required|digits:6',
 
-            'resume_link'   => 'nullable|url|max:500',
-            'profile_pic'   => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'biodata'       => 'nullable|string',
-            'achievements'  => 'nullable|string',
+            'resume_link' => 'nullable|url|max:500',
+            'profile_pic' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'biodata' => 'nullable|string',
+            'achievements' => 'nullable|string',
 
-            'for_org_type'  => 'required|string|in:government,private,ngo,other',
-            'availability'  => 'required|string|max:255',
+            'for_org_type' => 'required|string|in:government,private,ngo,other',
+            'availability' => 'required|string|max:255',
             'training_mode' => 'required|string|in:online,offline,hybrid',
 
             'signed_form_pdf' => 'nullable|file|mimes:pdf|max:5120'  // 5MB
@@ -209,8 +209,8 @@ class TAuthController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors'  => $validator->errors(),
-                'msg'     => 'Validation failed'
+                'errors' => $validator->errors(),
+                'msg' => 'Validation failed'
             ], 422);
         }
 
@@ -235,9 +235,9 @@ class TAuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message'     => 'Trainer signup successful',
-            'data'  => [
-                'token'   => $token,
+            'message' => 'Trainer signup successful',
+            'data' => [
+                'token' => $token,
                 'trainer' => $trainer,
                 'token_type' => 'Bearer'
             ],
@@ -255,14 +255,14 @@ class TAuthController extends Controller
         if (!$trainer) {
             return response()->json([
                 'success' => false,
-                'msg'     => 'Trainer not found'
+                'msg' => 'Trainer not found'
             ], 404);
         }
 
         return response()->json([
             'success' => true,
-            'message'     => 'Trainer fetched successfully',
-            'data'  => $trainer
+            'message' => 'Trainer fetched successfully',
+            'data' => $trainer
         ], 200);
     }
 
@@ -284,30 +284,30 @@ class TAuthController extends Controller
         if (!$trainer) {
             return response()->json([
                 'success' => false,
-                'msg'     => 'Trainer not found'
+                'msg' => 'Trainer not found'
             ], 404);
         }
 
         $validator = Validator::make($request->all(), [
-            'name'          => 'sometimes|required|string|max:255',
-            'email'         => 'sometimes|required|email|unique:trainers,email,' . $trainer->trainer_id . ',trainer_id',
-            'password'      => 'sometimes|nullable|min:6|max:32',
+            'name' => 'sometimes|required|string|max:255',
+            'email' => 'sometimes|required|email|unique:trainers,email,' . $trainer->trainer_id . ',trainer_id',
+            'password' => 'sometimes|nullable|min:6|max:32',
 
-            'phone'         => 'sometimes|nullable|string|max:15|unique:trainers,phone,' . $trainer->trainer_id . ',trainer_id',
-            'addr_line1'    => 'sometimes|required|string|max:255',
-            'addr_line2'    => 'sometimes|nullable|string|max:255',
-            'city'          => 'sometimes|required|string|max:255',
-            'state'         => 'sometimes|required|string|max:255',
-            'district'      => 'sometimes|required|string|max:255',
-            'pincode'       => 'sometimes|required|digits:6',
+            'phone' => 'sometimes|nullable|string|max:15|unique:trainers,phone,' . $trainer->trainer_id . ',trainer_id',
+            'addr_line1' => 'sometimes|required|string|max:255',
+            'addr_line2' => 'sometimes|nullable|string|max:255',
+            'city' => 'sometimes|required|string|max:255',
+            'state' => 'sometimes|required|string|max:255',
+            'district' => 'sometimes|required|string|max:255',
+            'pincode' => 'sometimes|required|digits:6',
 
-            'resume_link'   => 'sometimes|nullable|url|max:500',
-            'profile_pic'   => 'sometimes|nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'biodata'       => 'sometimes|nullable|string',
-            'achievements'  => 'sometimes|nullable|string',
+            'resume_link' => 'sometimes|nullable|url|max:500',
+            'profile_pic' => 'sometimes|nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'biodata' => 'sometimes|nullable|string',
+            'achievements' => 'sometimes|nullable|string',
 
-            'for_org_type'  => 'sometimes|required|string|in:school,coorporate,both',
-            'availability'  => 'sometimes|required|string|max:255',
+            'for_org_type' => 'sometimes|required|string|in:school,coorporate,both',
+            'availability' => 'sometimes|required|string|max:255',
             'training_mode' => 'sometimes|required|string|in:online,offline,both',
 
             'signed_form_pdf' => 'sometimes|nullable|file|mimes:pdf|max:5120'
@@ -316,8 +316,8 @@ class TAuthController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors'  => $validator->errors(),
-                'message'     => 'Validation failed'
+                'errors' => $validator->errors(),
+                'message' => 'Validation failed'
             ], 422);
         }
 
@@ -355,8 +355,8 @@ class TAuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'result'  => $trainer,
-            'message'     => 'Trainer updated successfully'
+            'result' => $trainer,
+            'message' => 'Trainer updated successfully'
         ], 200);
     }
 
@@ -371,7 +371,7 @@ class TAuthController extends Controller
         if (!$trainer) {
             return response()->json([
                 'success' => false,
-                'message'     => 'Trainer not found'
+                'message' => 'Trainer not found'
             ], 404);
         }
 
@@ -388,7 +388,53 @@ class TAuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message'     => 'Trainer deleted successfully'
+            'message' => 'Trainer deleted successfully'
         ], 200);
+    }
+    public function uploadSignedForm(Request $request)
+    {
+        $trainer = $request->user();
+
+        if (!$trainer || !($trainer instanceof Trainer)) {
+            return response()->json([
+                'success' => false,
+                'msg' => 'Unauthorized or invalid user type'
+            ], 401);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'signed_form_pdf' => 'required|file|mimes:pdf|max:5120'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+                'msg' => 'Validation failed'
+            ], 422);
+        }
+
+        if ($request->hasFile('signed_form_pdf')) {
+            if ($trainer->signed_form_pdf && Storage::disk('public')->exists($trainer->signed_form_pdf)) {
+                Storage::disk('public')->delete($trainer->signed_form_pdf);
+            }
+            $trainer->signed_form_pdf =
+                $request->file('signed_form_pdf')->store('trainer_signed_forms', 'public');
+
+            $trainer->save();
+
+            return response()->json([
+                'success' => true,
+                'msg' => 'Signed form uploaded successfully',
+                'data' => [
+                    'signed_form_pdf' => $trainer->signed_form_pdf
+                ]
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'msg' => 'No file uploaded'
+        ], 422);
     }
 }

@@ -54,6 +54,7 @@ Route::middleware(['auth:sanctum', 'trainer.api'])->group(function () {
 
     Route::post('trainer/{id}', [TAuthController::class, 'update']);
     Route::get('trainer/{id}', [TAuthController::class, 'show']);
+    Route::post('trainer/upload-signed-form', [TAuthController::class, 'uploadSignedForm'])->name('api.trainer.upload-signed-form');
     //Route::delete('trainer/{id}', [TAuthController::class, 'destroy']);
     //Route::get('trainers', [TAuthController::class, 'index']);
 
