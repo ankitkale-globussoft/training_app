@@ -61,6 +61,9 @@ class TrainerController extends Controller
         $trainer->verified = 'verified';
         $trainer->save();
 
+        // Send email
+        \Illuminate\Support\Facades\Mail::to($trainer->email)->send(new \App\Mail\TrainerVerifiedMail($trainer));
+
         return response()->json([
             'success' => true,
             'message' => 'Trainer verified successfully.'
@@ -75,6 +78,13 @@ class TrainerController extends Controller
         $trainer->save();
 
         $message = ($trainer->verified === 'suspended') ? 'Trainer suspended successfully.' : 'Trainer activated successfully.';
+
+        // Send email based on status
+        if ($trainer->verified === 'suspended') {
+            \Illuminate\Support\Facades\Mail::to($trainer->email)->send(new \App\Mail\TrainerSuspendedMail($trainer));
+        } else {
+            \Illuminate\Support\Facades\Mail::to($trainer->email)->send(new \App\Mail\TrainerVerifiedMail($trainer));
+        }
 
         return response()->json([
             'success' => true,
