@@ -16,8 +16,19 @@ class Organization extends Authenticatable
 
     protected $primaryKey = 'org_id';
     protected $fillable = [
-        'name', 'rep_designation', 'addr_line1', 'addr_line2', 'city', 'state', 'district',
-        'pincode', 'email', 'mobile', 'alt_mobile', 'org_image', 'password'
+        'name',
+        'rep_designation',
+        'addr_line1',
+        'addr_line2',
+        'city',
+        'state',
+        'district',
+        'pincode',
+        'email',
+        'mobile',
+        'alt_mobile',
+        'org_image',
+        'password'
     ];
 
     public function candidates(): HasMany
@@ -28,5 +39,11 @@ class Organization extends Authenticatable
     public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class, 'org_id', 'org_id');
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $link = route('org.password.reset', ['token' => $token, 'email' => $this->email]);
+        \Illuminate\Support\Facades\Mail::to($this->email)->send(new \App\Mail\ResetPasswordMail($link));
     }
 }

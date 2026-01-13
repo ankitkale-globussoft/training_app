@@ -28,8 +28,7 @@
                                                 d="M20.6,7.13333333 L25.6,13.8 C26.2627417,14.6836556 26.0836556,15.9372583 25.2,16.6 C24.8538077,16.8596443 24.4327404,17 24,17 L14,17 C12.8954305,17 12,16.1045695 12,15 C12,14.5672596 12.1403557,14.1461923 12.4,13.8 L17.4,7.13333333 C18.0627417,6.24967773 19.3163444,6.07059163 20.2,6.73333333 C20.3516113,6.84704183 20.4862915,6.981722 20.6,7.13333333 Z"
                                                 id="path-5"></path>
                                         </defs>
-                                        <g id="g-app-brand" stroke="none" stroke-width="1" fill="none"
-                                            fill-rule="evenodd">
+                                        <g id="g-app-brand" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
                                             <g id="Brand-Logo" transform="translate(-27.000000, -15.000000)">
                                                 <g id="Icon" transform="translate(27.000000, 15.000000)">
                                                     <g id="Mask" transform="translate(0.000000, 8.000000)">
@@ -76,7 +75,7 @@
                             <div class="mb-3 form-password-toggle">
                                 <div class="d-flex justify-content-between">
                                     <label class="form-label" for="password">Password</label>
-                                    <a href="auth-forgot-password-basic.html"><small>Forgot Password?</small></a>
+                                    <a href="{{ route('org.password.request') }}"><small>Forgot Password?</small></a>
                                 </div>
 
                                 <div class="input-group input-group-merge">
@@ -119,9 +118,9 @@
 @endsection
 
 @push('ajax')
-    <script>        
-        $(document).ready(function() {
-            $("#trainerLoginForm").on("submit", function(e) {
+    <script>
+        $(document).ready(function () {
+            $("#trainerLoginForm").on("submit", function (e) {
                 e.preventDefault();
 
                 // clear previous errors
@@ -130,7 +129,7 @@
 
                 // button loading state
                 $("#loginBtn").html('<span class="spinner-border spinner-border-sm"></span> Signing in...').prop("disabled", true);
-                
+
                 let formData = new FormData(this);
 
                 $.ajax({
@@ -138,8 +137,8 @@
                     url: "{{ route('org.login') }}",
                     data: formData,
                     processData: false,
-                    contentType: false,  
-                    success: function(response) {
+                    contentType: false,
+                    success: function (response) {
                         $("#loginBtn").html("Sign in").prop("disabled", false);
 
                         if (response.success === true) {
@@ -152,7 +151,7 @@
                             }
                         }
                     },
-                    error: function(xhr) {
+                    error: function (xhr) {
                         $("#loginBtn").html("Sign in").prop("disabled", false);
 
                         if (xhr.status === 422) {

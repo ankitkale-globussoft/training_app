@@ -35,5 +35,13 @@
                 </li>
             </ul>
         </li>
+
+        <!-- Certificates -->
+        <li class="menu-item {{ request()->routeIs('student.certificates.*') ? 'active' : '' }}">
+            <a href="{{ route('student.certificates.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-award"></i>
+                <div data-i18n="Certificates">Certificates</div>
+            </a>
+        </li>
     </ul>
 </aside>

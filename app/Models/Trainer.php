@@ -58,4 +58,10 @@ class Trainer extends Authenticatable
     {
         return $this->hasMany(TrainingContent::class, 'trainer_id', 'trainer_id');
     }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $link = route('trainer.password.reset', ['token' => $token, 'email' => $this->email]);
+        \Illuminate\Support\Facades\Mail::to($this->email)->send(new \App\Mail\ResetPasswordMail($link));
+    }
 }

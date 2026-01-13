@@ -36,16 +36,25 @@ class TestController extends Controller
             if ($booking && $booking->requirement) {
                 $programId = $booking->requirement->program_id;
 
-                // Get tests for this program that the student hasn't attempted
-                $attemptedTestIds = Attempt::where('candidate_id', $student->candidate_id)
-                    ->pluck('test_id')
+                // Get count of attempts per test for this student
+                $attemptsCount = Attempt::where('candidate_id', $student->candidate_id)
+                    ->select('test_id', DB::raw('count(*) as count'))
+                    ->groupBy('test_id')
+                    ->pluck('count', 'test_id')
                     ->toArray();
 
-                $availableTests = Test::where('program_id', $programId)
-                    ->whereNotIn('test_id', $attemptedTestIds)
+                // Get all tests for the program
+                $allTests = Test::where('program_id', $programId)
                     ->withCount('questions')
                     ->with('program')
                     ->get();
+
+                // Filter tests with < 3 attempts
+                $availableTests = $allTests->filter(function ($test) use ($attemptsCount) {
+                    $count = $attemptsCount[$test->test_id] ?? 0;
+                    $test->attempt_count = $count; // Inject for view
+                    return $count < 3;
+                });
             }
         }
 
@@ -59,14 +68,14 @@ class TestController extends Controller
     {
         $student = Auth::guard('student_web')->user();
 
-        // Check if student has already attempted this test
-        $existingAttempt = Attempt::where('candidate_id', $student->candidate_id)
+        // Check attempts count
+        $attemptsCount = Attempt::where('candidate_id', $student->candidate_id)
             ->where('test_id', $test_id)
-            ->first();
+            ->count();
 
-        if ($existingAttempt) {
-            return redirect()->route('student.tests.result', $existingAttempt->attempt_id)
-                ->with('error', 'You have already attempted this test.');
+        if ($attemptsCount >= 3) {
+            return redirect()->route('student.tests.attempted')
+                ->with('error', 'You have used all 3 attempts for this test.');
         }
 
         // Check if booking progress is 100%
@@ -99,14 +108,14 @@ class TestController extends Controller
         $student = Auth::guard('student_web')->user();
 
         // Security check
-        $existingAttempt = Attempt::where('candidate_id', $student->candidate_id)
+        $attemptsCount = Attempt::where('candidate_id', $student->candidate_id)
             ->where('test_id', $test_id)
-            ->first();
+            ->count();
 
-        if ($existingAttempt) {
+        if ($attemptsCount >= 3) {
             return response()->json([
                 'success' => false,
-                'message' => 'You have already attempted this test.'
+                'message' => 'You have used all 3 attempts for this test.'
             ], 403);
         }
 
@@ -152,15 +161,15 @@ class TestController extends Controller
         $student = Auth::guard('student_web')->user();
         $testId = $request->test_id;
 
-        // Check for existing attempt
-        $existingAttempt = Attempt::where('candidate_id', $student->candidate_id)
+        // Check for existing attempts
+        $attemptsCount = Attempt::where('candidate_id', $student->candidate_id)
             ->where('test_id', $testId)
-            ->first();
+            ->count();
 
-        if ($existingAttempt) {
+        if ($attemptsCount >= 3) {
             return response()->json([
                 'success' => false,
-                'message' => 'You have already attempted this test.'
+                'message' => 'You have used all 3 attempts for this test.'
             ], 403);
         }
 
@@ -202,16 +211,59 @@ class TestController extends Controller
     /**
      * Display attempted tests
      */
-    public function attempted()
+    /**
+     * Display attempted tests with search, filter and pagination
+     */
+    public function attempted(Request $request)
     {
         $student = Auth::guard('student_web')->user();
+        $query = Attempt::where('candidate_id', $student->candidate_id)
+            ->with(['test.program']);
 
-        $attempts = Attempt::where('candidate_id', $student->candidate_id)
-            ->with(['test.program'])
-            ->orderBy('created_at', 'desc')
+        // Search by Test Title or Program Title
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('test', function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhereHas('program', function ($sq) use ($search) {
+                        $sq->where('title', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        // Filter by Program
+        if ($request->filled('program_id')) {
+            $query->whereHas('test', function ($q) use ($request) {
+                $q->where('program_id', $request->program_id);
+            });
+        }
+
+        $attempts = $query->orderBy('created_at', 'desc')->paginate(10);
+
+        // Calculate attempt number for each attempt
+        $attempts->getCollection()->transform(function ($attempt) use ($student) {
+            $count = Attempt::where('candidate_id', $student->candidate_id)
+                ->where('test_id', $attempt->test_id)
+                ->where('created_at', '<=', $attempt->created_at)
+                ->count();
+            $attempt->attempt_number = $count;
+            return $attempt;
+        });
+
+        if ($request->ajax()) {
+            return view('student.test.partials.attempt_table', compact('attempts'))->render();
+        }
+
+        // Get unique programs for filter dropdown
+        $programs = DB::table('programs')
+            ->join('tests', 'programs.program_id', '=', 'tests.program_id')
+            ->join('attempts', 'tests.test_id', '=', 'attempts.test_id')
+            ->where('attempts.candidate_id', $student->candidate_id)
+            ->distinct()
+            ->select('programs.program_id', 'programs.title')
             ->get();
 
-        return view('student.test.attempted', compact('attempts'));
+        return view('student.test.attempted', compact('attempts', 'programs'));
     }
 
     /**

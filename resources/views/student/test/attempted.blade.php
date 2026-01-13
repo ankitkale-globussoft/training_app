@@ -8,7 +8,7 @@
                 <span class="text-muted fw-light">Student / Tests /</span> Attempted
             </h4>
 
-            @if($attempts->isEmpty())
+            @if($attempts->isEmpty() && !request()->filled('search') && !request()->filled('program_id'))
                 <div class="card">
                     <div class="card-body text-center py-5">
                         <i class="bx bx-file bx-lg text-muted mb-3"></i>
@@ -21,58 +21,26 @@
                 </div>
             @else
                 <div class="card">
-                    <h5 class="card-header">Your Test History</h5>
-                    <div class="table-responsive text-nowrap">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Test Title</th>
-                                    <th>Program</th>
-                                    <th>Score</th>
-                                    <th>Percentage</th>
-                                    <th>Time Taken</th>
-                                    <th>Status</th>
-                                    <th>Date</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody class="table-border-bottom-0">
-                                @foreach($attempts as $attempt)
-                                    @php
-                                        $percentage = ($attempt->score / $attempt->test->total_marks) * 100;
-                                        $isPassed = $percentage >= 60;
-                                        $minutes = floor($attempt->time_taken / 60);
-                                        $seconds = $attempt->time_taken % 60;
-                                        $timeTaken = $minutes > 0 ? "{$minutes}m {$seconds}s" : "{$seconds}s";
-                                    @endphp
-                                    <tr>
-                                        <td><strong>{{ $attempt->test->title }}</strong></td>
-                                        <td><span class="badge bg-label-primary">{{ $attempt->test->program->title }}</span></td>
-                                        <td><strong>{{ $attempt->score }}</strong> / {{ $attempt->test->total_marks }}</td>
-                                        <td>
-                                            <span class="badge {{ $isPassed ? 'bg-label-success' : 'bg-label-danger' }}">
-                                                {{ number_format($percentage, 2) }}%
-                                            </span>
-                                        </td>
-                                        <td>{{ $timeTaken }}</td>
-                                        <td>
-                                            @if($isPassed)
-                                                <span class="badge bg-success"><i class="bx bx-check-circle"></i> Passed</span>
-                                            @else
-                                                <span class="badge bg-danger"><i class="bx bx-x-circle"></i> Failed</span>
-                                            @endif
-                                        </td>
-                                        <td>{{ $attempt->created_at->format('d M Y, h:i A') }}</td>
-                                        <td>
-                                            <a href="{{ route('student.tests.result', $attempt->attempt_id) }}"
-                                                class="btn btn-sm btn-info">
-                                                <i class="bx bx-show"></i> View Details
-                                            </a>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                    <div class="card-header border-bottom">
+                        <h5 class="card-title mb-3">Your Test History</h5>
+                        <div class="d-flex justify-content-between align-items-center row pb-2 gap-3 gap-md-0">
+                            <div class="col-md-4 user_role">
+                                <select id="filter-program" class="form-select text-capitalize">
+                                    <option value="">All Programs</option>
+                                    @foreach($programs as $prog)
+                                        <option value="{{ $prog->program_id }}">{{ $prog->title }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-4 user_plan"></div> <!-- Spacer -->
+                            <div class="col-md-4 user_status">
+                                <input type="text" class="form-control" id="search-input" placeholder="Search Test Title...">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="table-container">
+                        @include('student.test.partials.attempt_table')
                     </div>
                 </div>
 
@@ -85,3 +53,50 @@
         </div>
     </div>
 @endsection
+
+@push('footer-script')
+<script>
+    $(document).ready(function() {
+        function fetchAttempts(page = 1) {
+            let search = $('#search-input').val();
+            let program_id = $('#filter-program').val();
+
+            $.ajax({
+                url: "{{ route('student.tests.attempted') }}?page=" + page,
+                type: "GET",
+                data: {
+                    search: search,
+                    program_id: program_id
+                },
+                success: function(response) {
+                    $('#table-container').html(response);
+                },
+                error: function(xhr) {
+                    console.error('Error fetching data');
+                }
+            });
+        }
+
+        // Keyup delay for search
+        let timeout = null;
+        $('#search-input').on('keyup', function() {
+            clearTimeout(timeout);
+            timeout = setTimeout(function() {
+                fetchAttempts();
+            }, 500);
+        });
+
+        // Filter change
+        $('#filter-program').on('change', function() {
+            fetchAttempts();
+        });
+
+        // Pagination click
+        $(document).on('click', '.pagination a', function(e) {
+            e.preventDefault();
+            let page = $(this).attr('href').split('page=')[1];
+            fetchAttempts(page);
+        });
+    });
+</script>
+@endpush

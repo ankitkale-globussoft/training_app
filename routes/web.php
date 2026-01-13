@@ -122,6 +122,12 @@ Route::prefix('trainer')->name('trainer.')->group(function () {
     Route::get('register', [TrainerAuthController::class, 'show_register'])->name('register');
     Route::post('register', [TrainerAuthController::class, 'register'])->name('register');
 
+    // Password Reset
+    Route::get('forgot-password', [App\Http\Controllers\Web\Trainer\PasswordResetController::class, 'showLinkRequestForm'])->name('password.request');
+    Route::post('forgot-password', [App\Http\Controllers\Web\Trainer\PasswordResetController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::get('reset-password/{token}', [App\Http\Controllers\Web\Trainer\PasswordResetController::class, 'showResetForm'])->name('password.reset');
+    Route::post('reset-password', [App\Http\Controllers\Web\Trainer\PasswordResetController::class, 'reset'])->name('password.update');
+
     // Trainer protected routes (requires auth + trainer role)
     Route::middleware('trainer.web')->group(function () {
 
@@ -179,6 +185,12 @@ Route::prefix('org')->name('org.')->group(function () {
 
     Route::get('login', [OrgAuthController::class, 'showLoginForm'])->name('login');
     Route::post('login', [OrgAuthController::class, 'login'])->name('login');
+
+    // Password Reset
+    Route::get('forgot-password', [App\Http\Controllers\Web\Org\PasswordResetController::class, 'showLinkRequestForm'])->name('password.request');
+    Route::post('forgot-password', [App\Http\Controllers\Web\Org\PasswordResetController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::get('reset-password/{token}', [App\Http\Controllers\Web\Org\PasswordResetController::class, 'showResetForm'])->name('password.reset');
+    Route::post('reset-password', [App\Http\Controllers\Web\Org\PasswordResetController::class, 'reset'])->name('password.update');
 
     // Org protected routes
     Route::middleware('org.web')->group(function () {
@@ -243,6 +255,12 @@ Route::prefix('student')->name('student.')->group(function () {
             Route::post('/submit', 'submit')->name('submit');
             Route::get('/attempted', 'attempted')->name('attempted');
             Route::get('/result/{attempt_id}', 'result')->name('result');
+        });
+
+        // Certificate Routes
+        Route::controller(App\Http\Controllers\Web\Student\CertificateController::class)->prefix('certificates')->name('certificates.')->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/{attempt_id}/view', 'show')->name('view');
         });
 
         Route::get('logout', [StudentAuthController::class, 'logout'])->name('logout');

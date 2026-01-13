@@ -37,7 +37,10 @@
                             <div class="card h-100">
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-start mb-3">
-                                        <div class="badge bg-label-primary">{{ $test->program->title }}</div>
+                                        <div>
+                                            <div class="badge bg-label-primary mb-1">{{ $test->program->title }}</div>
+                                            <div class="badge bg-label-info">Attempt {{ $test->attempt_count + 1 }} / 3</div>
+                                        </div>
                                         @if($test->duration)
                                             <small class="text-muted">
                                                 <i class="bx bx-time-five"></i> {{ $test->duration }} mins
